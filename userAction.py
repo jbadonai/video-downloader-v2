@@ -92,7 +92,7 @@ class UserActions():
                         QMessageBox.information(self.myself, 'URL exists', f'Provided URL  below exists in the download list. Please select/copy another URL to download. \n\n "[ {str(data["url"])} ]"')
                         self.myself.buttonAddNewCancel.click()
                     else:
-                        ans = QMessageBox.question(self.myself, "Restore Deleted download", "This URL exists but was deleted. Will you like to restore it?", QMessageBox.Yes | QMessageBox.No)
+                        ans = QMessageBox.question(self.myself, "Restore Deleted download", "You are trying to add a deleted url back into the download list. Will you like to restore it?", QMessageBox.Yes | QMessageBox.No)
                         if ans == QMessageBox.No:
                             self.myself.buttonAddNewCancel.click()
                         else:

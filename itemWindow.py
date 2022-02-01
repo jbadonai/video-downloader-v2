@@ -64,6 +64,10 @@ class ItemWindow(QMainWindow, my_item_window_interface_.Ui_MainWindow):
 
             self.timer = QBasicTimer()
 
+            self.my_menu = jba_menu(self)  # create instance of menu content and it's functions.
+
+            self.container = self.myself.scrollAreaWidgetContents.layout()
+
             self.initialize()
 
         except Exception as e:
@@ -252,152 +256,32 @@ class ItemWindow(QMainWindow, my_item_window_interface_.Ui_MainWindow):
 
     def contextMenuEvent(self, event):
         try:
-            if self.status == 'completed':
-                menu = QMenu(self)
-                menu.setStyleSheet(stylesheet.menu_style)
+            menu = QMenu(self)  # create an instance of the menu
+            menu.setStyleSheet(StyleSheet().menu_style)  # apply custom sytle to the menu
+            menu_list = self.my_menu.auto_menu()  # get the content of the menu
+            # print( menu_list)
+            # loop through the menu item list to apply icon and display them.
+            for m in menu_list:
+                menu_list[m] = eval(str(menu_list[m]))
 
+                if str(m).__contains__('separator'):
+                    menu_list[m]['name'] = menu.addSeparator()
+                else:
+                    menu_list[m]['name'] = menu.addAction(menu_list[m]['text'])
+                    menu_list[m]['name'].setIcon(QIcon(menu_list[m]['icon']))
 
-                menuCopy = menu.addAction("Copy URL")
-                menuCopy.setIcon(QIcon(':/white icons/White icon/copy.svg'))
+            action = menu.exec_(self.mapToGlobal(event.pos()))
 
-                menuCopyPlaylistURL = menu.addAction('Copy playlist URL')
-                menuCopyPlaylistURL.setIcon(QIcon(':/white icons/White icon/copy.svg'))
+            for m in menu_list:
 
-                menuSeparator = menu.addSeparator()
+                if action == menu_list[m]['name']:
+                    #   get the function name to be executed and run / evaluate it.
+                    print('here')
+                    eval(f"self.my_menu.{menu_list[m]['function_name']}")
+                    break
 
-                menuStart = menu.addAction("Restart")
-                menuStart.setIcon(QIcon(':/white icons/White icon/play.svg'))
-
-                menuStop = menu.addAction("Stop")
-                menuStop.setIcon(QIcon(':/white icons/White icon/stop-circle.svg'))
-
-                menuSeparator1 = menu.addSeparator()
-
-                menuDownloadLocation = menu.addAction("Open in Explorer")
-                menuDownloadLocation.setIcon(QIcon(':/white icons/White icon/folder.svg'))
-
-                menuSeparator2 = menu.addSeparator()
-
-                menuDeleteDownload = menu.addAction(f"Delete '{self.title[:20]}...'")
-                menuDeleteDownload.setIcon(QIcon(':/white icons/White icon/trash-2.svg'))
-
-                action = menu.exec_(self.mapToGlobal(event.pos()))
-
-                if action == menuCopy:
-                    clipboard.copy(self.videoURL)
-
-                if action == menuDownloadLocation:
-                    try:
-                        print(self.downloadLocation)
-                        # os.popen(self.downloadLocation)
-                        # subprocess.Popen(f'explorer {self.downloadLocation}')
-                        subprocess.Popen(rf'explorer /select,"{self.downloadLocation}"')
-                    except Exception as e:
-                        print(e)
-
-                if action == menuCopyPlaylistURL:
-                    clipboard.copy(self.playlistURL)
-
-                if action == menuStart:
-                    if self.my_parent.is_there_waiting_download is False:
-                        downloading_number = self.database.get_downloading_number()  # retrieve downloading number from the database
-                        max_download_allowed = int(self.database.get_settings('max_download'))
-                        if downloading_number < max_download_allowed:
-                            self.database.set_status(self.videoURL, 'downloading')
-                        else:
-                            self.database.set_status(self.videoURL, 'waiting')
-                    else:
-                        self.database.set_status(self.videoURL, 'waiting')
-
-                if action == menuStop:
-                    if self.database.get_status(self.videoURL) != 'completed':
-                        self.database.set_status(self.videoURL, 'stopped')
-
-                if action == menuDeleteDownload:
-                    try:
-                        index = self.get_index()
-                        ans = QMessageBox.question(self, "Delete?", f"Delete '{self.title}'", QMessageBox.Yes | QMessageBox.No)
-                        if ans == QMessageBox.Yes:
-                            self.database.set_status(self.videoURL, "deleted")
-                            self.delete_index(index)
-                            pass
-                    except Exception as e:
-                        print(f"An error occurred in ItemWindow > ContextMenuEvent > action==menuDeletedDownload: {e}")
-
-            else:
-                menu = QMenu(self)
-                menu.setStyleSheet(stylesheet.menu_style)
-
-                menuCopy = menu.addAction("Copy URL")
-                menuCopy.setIcon(QIcon(':/white icons/White icon/copy.svg'))
-
-                menuCopyPlaylistURL = menu.addAction('Copy playlist URL')
-                menuCopyPlaylistURL.setIcon(QIcon(':/white icons/White icon/copy.svg'))
-
-                menuSeparator = menu.addSeparator()
-
-                menuStart = menu.addAction("Start")
-                menuStart.setIcon(QIcon(':/white icons/White icon/play.svg'))
-
-                menuStop = menu.addAction("Stop")
-                menuStop.setIcon(QIcon(':/white icons/White icon/stop-circle.svg'))
-
-                menuSeparator1 = menu.addSeparator()
-
-                menuDownloadLocation = menu.addAction("Open in Explorer")
-                menuDownloadLocation.setIcon(QIcon(':/white icons/White icon/folder.svg'))
-
-                menuSeparator2 = menu.addSeparator()
-
-                menuDeleteDownload = menu.addAction(f"Delete '{self.title[:20]}...'")
-                menuDeleteDownload.setIcon(QIcon(':/white icons/White icon/trash-2.svg'))
-
-                action = menu.exec_(self.mapToGlobal(event.pos()))
-
-                if action == menuCopy:
-                    clipboard.copy(self.videoURL)
-
-                if action == menuDownloadLocation:
-                    try:
-                        print(os.path.normpath(self.downloadLocation))
-                        # os.popen(self.downloadLocation)
-                        # subprocess.Popen(f'explorer {self.downloadLocation}')
-                        subprocess.Popen(rf'explorer /select,"{os.path.normpath(self.downloadLocation)}')
-                    except Exception as e:
-                        print(e)
-
-                if action == menuCopyPlaylistURL:
-                    clipboard.copy(self.playlistURL)
-
-                if action == menuStart:
-                    if self.my_parent.is_there_waiting_download is False:
-                        downloading_number = self.database.get_downloading_number()  # retrieve downloading number from the database
-                        max_download_allowed = int(self.database.get_settings('max_download'))
-                        if downloading_number < max_download_allowed:
-                            self.database.set_status(self.videoURL, 'downloading')
-                        else:
-                            self.database.set_status(self.videoURL, 'waiting')
-                    else:
-                        self.database.set_status(self.videoURL, 'waiting')
-
-                if action == menuStop:
-                    if self.status != 'completed':
-                        self.stop_downloading()
-
-
-                if action == menuDeleteDownload:
-                    try:
-                        index = self.get_index()
-                        ans = QMessageBox.question(self, "Delete?", f"Delete '{self.title}'",
-                                                   QMessageBox.Yes | QMessageBox.No)
-                        if ans == QMessageBox.Yes:
-                            self.database.set_status(self.videoURL, "deleted")
-                            self.delete_index(index)
-                            pass
-                    except Exception as e:
-                        print(f"An error occurred in ItemWindow > ContextMenuEvent > action==menuDeletedDownload: {e}")
         except Exception as e:
-            print(f"An error occurred in  Common > ItemWindow > contextMenuEvent(): \n>>{e}")
+            print(f"An error occurred in  itemWindow >  contextMenuEvent(): \n>>{e}")
 
     def closeEvent(self, a0):
         if self.status != 'completed':
