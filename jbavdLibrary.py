@@ -763,6 +763,20 @@ class VideoDatabase():
 
             cursor.execute('select status from VideoData where url = ? ', (url,))
             data = cursor.fetchall()
+
+            return data[0][0]
+        except Exception as e:
+            print(f"An error occurred in database module ' GET STATUS' : {e}")
+
+    def get_status_by_playlist_url(self, playlist_url):
+        ''' gets status of the specified url '''
+        try:
+            connection = sqlite3.connect(self.dbname)
+            cursor = connection.cursor()
+
+            cursor.execute('select status from VideoData where playlist_url = ? ', (playlist_url,))
+            data = cursor.fetchall()
+
             return data[0][0]
         except Exception as e:
             print(f"An error occurred in database module ' GET STATUS' : {e}")
@@ -811,6 +825,21 @@ class VideoDatabase():
             cursor = connection.cursor()
 
             cursor.execute("update VideoData set status = ? where url = ?", (status, url))
+            connection.commit()
+            connection.close()
+        except Exception as e:
+            print(f"An error occurred in database module 'SET STATUS': ")
+
+    def set_status_using_playlist_url(self, playlist_url, status):
+        '''
+        set status for provided key (url)
+        '''
+
+        try:
+            connection = sqlite3.connect(self.dbname)
+            cursor = connection.cursor()
+
+            cursor.execute("update VideoData set status = ? where url = ?", (status, playlist_url))
             connection.commit()
             connection.close()
         except Exception as e:
@@ -1326,6 +1355,7 @@ class AddNewDownloadThread(QtCore.QThread):
             self.any_signal.emit(self.data)
             time.sleep(1)
             url_exists = self.db.is_playlist_url_exists_in_database(self.url)
+
 
             if url_exists is False:
                 # check and wait for internet connection

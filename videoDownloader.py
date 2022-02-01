@@ -2,7 +2,8 @@ import os
 import signal
 import time
 
-from PyQt5.QtWidgets import QMainWindow, QApplication, QGraphicsDropShadowEffect, QSizeGrip,QWidget, QMenu, QMessageBox
+from PyQt5.QtWidgets import QMainWindow, QApplication, QGraphicsDropShadowEffect, QSizeGrip,QWidget, QMenu, \
+    QMessageBox, QFileDialog
 from PyQt5.QtCore import Qt, QPropertyAnimation, QEasingCurve, QProcess, QEvent, QBasicTimer
 from PyQt5.QtGui import QColor, QIcon
 
@@ -95,6 +96,7 @@ class MainWindow(QMainWindow, my_interface_.Ui_MainWindow):
             print("Loading Items from Database...")
             # time.sleep(0.2)
             self.dataLoader.start_loading()     # LOAD DATA FROM THE DATABASE
+
             # self.generalFunctions.run_function(self.dataLoader.start_loading)
         else:   # no data in the database
             self.message = "No data in the database yet. Click Add New from the menu to start downloading"
@@ -116,28 +118,137 @@ class MainWindow(QMainWindow, my_interface_.Ui_MainWindow):
         pass
 
     def filter(self):
+        self.filter_all()
+
+        def start():
+            sender = self.sender()
+            status = None
+
+            if sender.objectName() == self.buttonWaiting.objectName():
+                status = 'waiting'
+            elif sender.objectName() == self.buttonInProgress.objectName():
+                status = 'downloading'
+            elif sender.objectName() == self.buttonCompleted.objectName():
+                status = 'completed'
+            elif sender.objectName() == self.buttonStopped.objectName():
+                status = 'stopped'
+            try:
+                self.selected_filter = status
+                # self.filter_all()
+                if status is not None:
+                    for x in range(self.scrollAreaWidgetContents.layout().count()):
+                        item = self.scrollAreaWidgetContents.layout().itemAt(x).widget()
+                        item_status = item.textStatus.text()
+                        if item_status == status:
+                            item.show()
+                        else:
+                            item.hide()
+
+            except Exception as e:
+                print(f"An error occurred in MainWindow > filter all: {e}")
+
+        self.generalFunctions.run_function(start)
+
         pass
 
     def filter_all(self):
-        pass
-
-    def settings(self):
+        try:
+            # self.selected_filter = None
+            for x in range(self.scrollAreaWidgetContents.layout().count()):
+                item = self.scrollAreaWidgetContents.layout().itemAt(x).widget()
+                # status = item.textStatus.text()
+                item.show()
+        except Exception as e:
+            print(f"An error occurred in MainWindow > filter all: {e}")
         pass
 
     def browse_folder_location(self):
+        try:
+            print('browsing for folder location...')
+            dl = QFileDialog.getExistingDirectory(self, "open location")
+            if dl != "":
+                self.textDefaultDownloadLocation.setText(dl)
+        except Exception as e:
+            print(f"An error occurred in 'COMMON'>'ADD NEW DOWNLOAD THREAD'>'browse folder location:\n{e}")
+            return 'Error'
         pass
+
+    def settings(self):
+        self.show_settings_page()
 
     def settings_cancel(self):
-        pass
+        self.show_download_page()
 
     def settings_ok(self):
+        try:
+            self.database.update_setting('max_download', int(self.spinBox_MaxDownload.value()))
+            self.database.update_setting('max_retries', int(self.spinBox_MaxRetries.value()))
+            self.database.update_setting('default_download_location', self.textDefaultDownloadLocation.text())
+
+            self.show_download_page()
+        except Exception as e:
+            print(f"An Error Occurred in MainWindow > settings_ok")
         pass
 
     def stop_all(self):
+        def run():
+            try:
+                for x in range(self.scrollAreaWidgetContents.layout().count()):
+                    url = self.scrollAreaWidgetContents.layout().itemAt(x).widget().videoURL
+                    # status = self.scrollAreaWidgetContents.layout().itemAt(x).widget().status
+                    status = self.database.get_status(url)
+                    title = self.scrollAreaWidgetContents.layout().itemAt(x).widget().title
+                    if status != 'completed' and status != 'stopped':
+                        self.database.set_status(url, 'stopped')
+                        print(f"stopping '{title}'...")
+            except Exception as e:
+                print(f"An error occurred in mainwindow > stop all > run: \n>>> {e}")
+
+        try:
+            self.generalFunctions.run_function(run)
+        except Exception as e:
+            print(f"An error occurred in mainwindow > stop all: \n>>> {e}")
+            pass
         pass
 
     def delete_completed(self):
-        pass
+        def run():
+            try:
+                print('delinting..................')
+                # self.buttonAll.click()
+                self.filter_all()
+
+                def delete_one():
+                    for x in range(self.scrollAreaWidgetContents.layout().count()):
+                        url = self.scrollAreaWidgetContents.layout().itemAt(x).widget().videoURL
+                        status = self.database.get_status(url)
+                        # status = self.scrollAreaWidgetContents.layout().itemAt(x).widget().status
+                        if status == 'completed':
+                            self.database.set_status(url, 'deleted')
+                            self.scrollAreaWidgetContents.layout().itemAt(x).widget().deleteLater()
+                            return True
+
+                    return False
+
+                while True:
+                    if self.scrollAreaWidgetContents.layout().count() > 0:
+                        print(f'total = {self.scrollAreaWidgetContents.layout().count()}')
+                        ans = delete_one()
+                        if ans is False:
+                            print('not finally but nothing is remaining')
+                            break
+                    else:
+                        print('finally')
+                        break
+                    time.sleep(0.2)
+
+                print('deleting completed is now completed.')
+
+            except Exception as e:
+                print(f'An Error occurred in mainwindow > delete completed:  \n >>> {e}')
+
+        self.generalFunctions.run_function(run)
+        # run()
 
     def add_new_ok(self):
         if self.busy is False:

@@ -85,9 +85,28 @@ class UserActions():
 
                 if 'url_exists' in data:
                     # if url exists in database do not proceed.
-                    QMessageBox.information(self.myself, 'URL exists', f'Provided URL  below exists in the download list. Please select/copy another URL to download. \n\n "[ {str(data["url"])} ]"')
-                    self.myself.buttonAddNewCancel.click()
+                    url = str(data["url"])
+                    status = self.database.get_status_by_playlist_url(url)
+                    print(f'status: {status}')
+                    if status != 'deleted':
+                        QMessageBox.information(self.myself, 'URL exists', f'Provided URL  below exists in the download list. Please select/copy another URL to download. \n\n "[ {str(data["url"])} ]"')
+                        self.myself.buttonAddNewCancel.click()
+                    else:
+                        ans = QMessageBox.question(self.myself, "Restore Deleted download", "This URL exists but was deleted. Will you like to restore it?", QMessageBox.Yes | QMessageBox.No)
+                        if ans == QMessageBox.No:
+                            self.myself.buttonAddNewCancel.click()
+                        else:
+                            self.myself.buttonAddNewCancel.click()
+                            allDataInDb = self.database.get_all_video_data()
+                            for data in allDataInDb:
+                                d = self.generalFunction.database_list_to_dictionary(data)
+                                # print(d)
+                                if d['playlist_url'] == url:
+                                    self.database.set_status(d['url'], "waiting")
+                                    win = ItemWindow(d, self.myself)
+                                    self.myself.scrollAreaWidgetContents.layout().addWidget(win)
 
+                            pass
                 if 'download_data' in data:
                     # print('OK clicked and data acquired.')
                     data = data['download_data']

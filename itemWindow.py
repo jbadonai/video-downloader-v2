@@ -157,10 +157,12 @@ class ItemWindow(QMainWindow, my_item_window_interface_.Ui_MainWindow):
                         print(f'Error in percentage: {e}')
 
                     if data['already_downloaded'] is True:
+
                         print("File already downloaded. Thanks")
                         self.database.set_status(self.videoURL, 'completed')
                         print("done!")
                         self.threadController[f"{str(self.title[:10]).strip().replace(' ','_')}"].stop()
+                        # self.timer.stop()
 
                     if data['completed'] is True:
                         print("Download Completed. Thanks")
@@ -238,7 +240,13 @@ class ItemWindow(QMainWindow, my_item_window_interface_.Ui_MainWindow):
                 self.stop_downloading()
                 print('waiting action detected while still downloading. stopping now...')
                 self.database.set_status(self.videoURL, 'waiting')
+
+            if self.status == 'completed' and self.textStatus.text() == 'completed':
+                print('stopping the timer')
+                self.timer.stop()
             pass
+
+
         except Exception as e:
             print(f"An Error occurred in Common > Itemwindow > timer(): \n{e}")
 
