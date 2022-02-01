@@ -44,6 +44,7 @@ class MainWindow(QMainWindow, my_interface_.Ui_MainWindow):
         self.interfaceLoader = self.bootLoader.LoadInterface(self)  # code for loading interface executes here
         self.dataLoader = self.bootLoader.LoadDataFromDB(self)  # code for loading data from database executes here
         self.engineLoader = self.bootLoader.LoadEngines(self)   #   controls engine loading
+
         self.my_menu = jba_menu(self)   # create instance of menu content and it's functions.
         self.userAction = UserActions(self)
 
@@ -70,6 +71,7 @@ class MainWindow(QMainWindow, my_interface_.Ui_MainWindow):
         self.is_internet = False
 
         self.busy = False
+        self.isReady = False
 
         self.initialize()
         # self.generalFunctions.run_function(self.initialize)
@@ -97,11 +99,13 @@ class MainWindow(QMainWindow, my_interface_.Ui_MainWindow):
         else:   # no data in the database
             self.message = "No data in the database yet. Click Add New from the menu to start downloading"
             print("No data in the database yet. Click Add New from the menu to start downloading")
+            self.isReady = True
 
         #   4. load engines
         self.engineLoader.load_internet_checker_engine()    # load internet availability checker engine
         self.engineLoader.load_statistics_getter_engine()   # load statistics getter engine
-        # load download monitoring enging [ not implemented yet ]
+        # load download monitoring engine [ not implemented yet ]
+        self.engineLoader.load_downloader_engine()
 
     def add_new_download(self):
         if self.busy is False:

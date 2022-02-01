@@ -13,7 +13,8 @@ import psutil
 import shutil
 from datetime import datetime, date
 import sys
-from jbavdLibrary import StyleSheet, LoadDataFromDatabaseThread, IsInternetThread, GetStatisticsThread
+from jbavdLibrary import StyleSheet, LoadDataFromDatabaseThread, IsInternetThread, GetStatisticsThread, \
+    DownloadMonitoringEngineThread
 from itemWindow import ItemWindow
 
 
@@ -183,6 +184,8 @@ class LoadDataFromDB():
 
                     print('data loading completed')
                     self.my_self.message = "Data loading Completed successfully"
+                    self.my_self.isReady = True
+
             except Exception as e:
                 print(f"An Error occurred in boot > LoadDataFromDB  > loading_connector:>>>\n{e}")
 
@@ -275,21 +278,12 @@ class LoadEngines():
             pass
 
         try:
-            self.threadController['download_engine'] = DownloaderEngineThread(my_self)
+
+            self.threadController['download_engine'] = DownloadMonitoringEngineThread(my_self)
             self.threadController['download_engine'].start()
             self.threadController['download_engine'].any_signal.connect(downloader_engine_connector)
         except Exception as e:
             print(f"An error occurred in MainWindow > download_engine_thread. : \n {e}")
-
-        # 1. check if there is a waiting downnload
-
-        # 2. check if maximum allowed download has not been exceeded
-
-        # 3. pick the next waiting download
-
-        # 4. start the download for the next waiting download
-
-        # 5. go to the begining again to check if there is still waiting download.
         pass
 
 

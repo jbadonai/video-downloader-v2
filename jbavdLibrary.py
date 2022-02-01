@@ -2102,7 +2102,7 @@ class ItemWindowDownloaderEngine(QtCore.QThread):
             if self.downloadFormat is None:
                 self.functions.run_function(self.download, False, self.videoURL, self.downloadLocation)
             else:
-                self.functions.run_function(self.download, False, self.videoURL, self.downloadLocation, self.format)
+                self.functions.run_function(self.download, False, self.videoURL, self.downloadLocation, self.my_parent.downloadFormat)
 
             while True:
                 if self.is_running is False:
@@ -2157,7 +2157,7 @@ class ItemWindowDownloaderEngine(QtCore.QThread):
                 time.sleep(1)
 
         except Exception as e:
-            print(f"An Error Occurred in JbavdLibrary > ItemWindowDownloaderEngine > Start")
+            print(f"An Error Occurred in JbavdLibrary > ItemWindowDownloaderEngine > Start: \n >>> {e}")
 
     class MyLogger(object):
         loggerEmergencyStop = False
@@ -2333,7 +2333,7 @@ class ItemWindowDownloaderEngine(QtCore.QThread):
             ydl_opts = {
                 'outtmpl': outtmpl,
                 'format': 'bestaudio/best',
-                'password':'Zu@6LFzU',
+                # 'password':'Zu@6LFzU',
                 # 'writethumbnail': True,
                 'postprocessors': [{
                     'key': 'FFmpegExtractAudio',
