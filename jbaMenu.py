@@ -218,7 +218,11 @@ class JbaMenuClass():
                                                                      "Proceed with the reset?", QMessageBox.Yes | QMessageBox.No)
         if ans == QMessageBox.Yes:
             d = round(time.time())
-            shutil.move('jbacfg', os.path.join(os.getcwd(), 'rb', f'jbacfg_deleted_{d}'))
+
+            if os.path.exists('jrb') is False:
+                os.mkdir('jrb')
+
+            shutil.move('jbacfg', os.path.join(os.getcwd(), 'jrb', f'jbacfg_deleted_{d}'))
             self.my_parent.restart_application()
             print('reseting database...')
 
