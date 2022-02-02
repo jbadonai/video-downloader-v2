@@ -79,6 +79,9 @@ class ItemWindow(QMainWindow, my_item_window_interface_.Ui_MainWindow):
         self.timer.start(200, self)
         self.functions.run_function(self.load_data)
 
+    def restart(self):
+        self.timer.start(200, self)
+
     def display_content(self):
 
         def start():
@@ -225,6 +228,7 @@ class ItemWindow(QMainWindow, my_item_window_interface_.Ui_MainWindow):
     def timerEvent(self, e):
         try:
             self.status = self.database.get_status(self.videoURL)
+
             self.textStatus.setText(self.status)
 
             # if self.dataLoadingCompleted is True:
@@ -252,7 +256,10 @@ class ItemWindow(QMainWindow, my_item_window_interface_.Ui_MainWindow):
 
 
         except Exception as e:
-            print(f"An Error occurred in Common > Itemwindow > timer(): \n{e}")
+            print(f"An Error occurred in Common > Itemwindow > timer()::{self.title}: \n{e}")
+            if str(e).strip() == 'list index out of range':
+                self.timer.stop()
+                self.close()
 
     def contextMenuEvent(self, event):
         try:

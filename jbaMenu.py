@@ -35,7 +35,7 @@ class JbaMenuClass():
                                 'function_name': 'backup()'},
 
             'Restore Database': {'name': '',
-                                 'text': 'Restore Database',
+                                 'text': 'Restore Database (beta)',
                                  'icon': ':/white icons/White icon/corner-left-down.svg',
                                  'function_name': 'restore_database()'},
 
@@ -82,7 +82,7 @@ class JbaMenuClass():
             'Delete Selected Items': {'name': '',
                                       'text': 'Delete Selected Items',
                                       'icon': ':/white icons/White icon/trash.svg',
-                                      'function_name': 'delete_selected()'},
+                                      'function_name': 'delete_selected_list()'},
 
             'separator5': {'name': '',
                            'text': 'separator',
@@ -161,7 +161,7 @@ class JbaMenuClass():
                            'function_name': ''},
 
             'Delete': {'name': '',
-                       'text': 'Delete',
+                       'text': f'Delete {self.my_parent.title[:30]}...',
                        'icon': ':/white icons/White icon/trash-2.svg',
                        'function_name': 'delete_selected()'}
         }
@@ -170,7 +170,8 @@ class JbaMenuClass():
 
     def backup(self):
         try:
-            shutil.copy(os.path.join(os.getcwd(), "jbacfg"), os.path.join(os.getcwd(), f"backup\\jbacfg"))
+            d = round(time.time())
+            shutil.copy(os.path.join(os.getcwd(), "jbacfg"), os.path.join(os.getcwd(), f"backup\\jbacfg_{d}"))
             print('backed up succesfully')
             QMessageBox.information(self.my_parent, "Backup Successful!", "Database was backed up successfully.")
 
@@ -178,25 +179,115 @@ class JbaMenuClass():
             print(f"An Error Occurred in jbaMenu >JbaMenuClass>backup: \n>>{e}")
 
     def restore_database(self):
-        print('restoring database....')
+        try:
+            file = self.my_parent.browse_file_location()
+
+            if file is not None:
+                if str(file).__contains__('jbacfg'):
+
+                    f = str(os.path.split(file)[1]).split("_")[0]
+                    p = os.path.split(file)[0]
+
+                    filename = os.path.join(os.getcwd(), f)
+                    filename = os.path.normpath(filename)
+
+                    if os.path.exists('jbacfg'):
+                        ans = QMessageBox.question(self.my_parent, "Restore",
+                                                   "Are you sure you want to replace current data with this one?",
+                                                   QMessageBox.Yes | QMessageBox.No)
+                        if ans == QMessageBox.Yes:
+                            # self.my_parent.buttonStopAll.click()
+                            # time.sleep(1)
+                            # self.my_parent.buttonStopAll.click()
+                            # time.sleep(1)
+
+                            new_database = file
+                            to_be_replaced = filename
+                            self.my_parent.replace_database(new_database, to_be_replaced)
+
+                            pass
+
+                else:
+                    QMessageBox.warning(self.my_parent, "Invalid File",
+                                        "File selected is not a backup file. Please select a file backed up by this application.")
+        except Exception as e:
+            print(f"An Error Occurred in MainWindow >contextMenuEvent>menuRestoreDB: \n>>{e}")
 
     def reset_database(self):
-        print('reseting database...')
+        ans = QMessageBox.question(self.my_parent, "Reset Database", "This action will permanently delete all download data.\n"
+                                                                     "Proceed with the reset?", QMessageBox.Yes | QMessageBox.No)
+        if ans == QMessageBox.Yes:
+            d = round(time.time())
+            shutil.move('jbacfg', os.path.join(os.getcwd(), 'rb', f'jbacfg_deleted_{d}'))
+            self.my_parent.restart_application()
+            print('reseting database...')
 
     def select_multiple(self):
-        print('selecting multiple...')
+        try:
+            if self.my_parent.scrollAreaWidgetContents.layout().count() > 0:
+                for x in range(self.my_parent.scrollAreaWidgetContents.layout().count()):
+                    if self.my_parent.scrollAreaWidgetContents.layout().itemAt(x).widget().checkBoxSelect.isVisible():
+                        self.my_parent.scrollAreaWidgetContents.layout().itemAt(x).widget().checkBoxSelect.setChecked(False)
+                        self.my_parent.scrollAreaWidgetContents.layout().itemAt(x).widget().checkBoxSelect.setVisible(False)
+                    else:
+                        self.my_parent.scrollAreaWidgetContents.layout().itemAt(x).widget().checkBoxSelect.setVisible(
+                            True)
+
+        except Exception as e:
+            print(f"An error occurred in MainWindow > contextMenuEvent() > menuMultipleSelect: \n>>>{e}")
+        pass
 
     def select_all(self):
-        print('selecting all....')
+        try:
+            if self.my_parent.scrollAreaWidgetContents.layout().count() > 0:
+                for x in range(self.my_parent.scrollAreaWidgetContents.layout().count()):
+                    if self.my_parent.scrollAreaWidgetContents.layout().itemAt(x).widget().checkBoxSelect.isVisible():
+                        if self.my_parent.scrollAreaWidgetContents.layout().itemAt(
+                                x).widget().checkBoxSelect.isChecked() is False:
+                            self.my_parent.scrollAreaWidgetContents.layout().itemAt(x).widget().checkBoxSelect.setChecked(True)
+        except Exception as e:
+            print(f"An error occurred in MainWindow > contextMenuEvent() > menuMultipleSelect: \n>>>{e}")
+        pass
 
     def deselect_all(self):
-        print('deselecting all...')
+        try:
+            if self.my_parent.scrollAreaWidgetContents.layout().count() > 0:
+                for x in range(self.my_parent.scrollAreaWidgetContents.layout().count()):
+                    if self.my_parent.scrollAreaWidgetContents.layout().itemAt(x).widget().checkBoxSelect.isVisible():
+                        if self.my_parent.scrollAreaWidgetContents.layout().itemAt(x).widget().checkBoxSelect.isChecked():
+                            self.my_parent.scrollAreaWidgetContents.layout().itemAt(x).widget().checkBoxSelect.setChecked(False)
+        except Exception as e:
+            print(f"An error occurred in MainWindow > contextMenuEvent() > menuMultipleSelect: \n>>>{e}")
+        pass
 
-    def delete_selected(self):
-        print("deleting selected items....")
+    def delete_selected_list(self):
+        try:
+            if self.my_parent.scrollAreaWidgetContents.layout().count() > 0:
+                for x in range(self.my_parent.scrollAreaWidgetContents.layout().count()):
+                    if self.my_parent.scrollAreaWidgetContents.layout().itemAt(x).widget().checkBoxSelect.isVisible():
+                        if self.my_parent.scrollAreaWidgetContents.layout().itemAt(x).widget().checkBoxSelect.isChecked():
+                            url = self.my_parent.scrollAreaWidgetContents.layout().itemAt(x).widget().videoURL
+                            self.my_parent.database.set_status(url, 'deleted')
+                            self.my_parent.scrollAreaWidgetContents.layout().itemAt(x).widget().deleteLater()
+
+        except Exception as e:
+            print(f"An error occurred in MainWindow > contextMenuEvent() > menuMultipleSelect: \n>>>{e}")
+        pass
 
     def show_hide_image(self):
-        print('hiding or showing images...')
+        try:
+            if self.my_parent.scrollAreaWidgetContents.layout().count() > 0:
+                for x in range(self.my_parent.scrollAreaWidgetContents.layout().count()):
+                    if self.my_parent.scrollAreaWidgetContents.layout().itemAt(x).widget().labelImage.width() == 0:
+                        self.my_parent.scrollAreaWidgetContents.layout().itemAt(x).widget().labelImage.setMinimumWidth(80)
+                        self.my_parent.scrollAreaWidgetContents.layout().itemAt(x).widget().labelImage.setMaximumWidth(80)
+                    else:
+                        self.my_parent.scrollAreaWidgetContents.layout().itemAt(x).widget().labelImage.setMinimumWidth(0)
+                        self.my_parent.scrollAreaWidgetContents.layout().itemAt(x).widget().labelImage.setMaximumWidth(0)
+
+        except Exception as e:
+            print(f"An error occurred in MainWindow > contextMenuEvent() > menuMultipleSelect: \n>>>{e}")
+        pass
 
     # item window menu function starts here
     def copy_url(self):
@@ -209,6 +300,7 @@ class JbaMenuClass():
         # print('copying playlist url...')
 
     def restart(self):
+        self.my_parent.restart()
         if self.my_parent.myself.is_there_waiting_download is False:
             downloading_number = self.my_parent.database.get_downloading_number()  # retrieve downloading number from the database
             max_download_allowed = int(self.my_parent.database.get_settings('max_download'))
@@ -227,9 +319,26 @@ class JbaMenuClass():
         try:
             path = os.path.normpath(f"{self.my_parent.myself.default_download_location}\\")
             print(path)
+            if self.my_parent.downloadVideo is True:
+                filename = f"{self.my_parent.title}.mp4"
+            else:
+                filename = f"{self.my_parent.title}.mp3"
+
+            fullFilePath = os.path.join(path, filename)
+
             # os.popen(self.downloadLocation)
             # subprocess.Popen(f'explorer {self.downloadLocation}')
-            subprocess.Popen(rf'explorer /select,"{path}\\"')
+            if os.path.exists(fullFilePath):
+                subprocess.Popen(rf'explorer /select,"{fullFilePath}"')
+            else:
+
+                QMessageBox.information(self.my_parent, 'File not found', 'File not found in the download directory!'
+                                                                          ' \nPossibly the file has been moved or file '
+                                                                          'download is yet to be completed.\n\n'
+                                                                          'Please restart the download if not '
+                                                                          'in progress.')
+                subprocess.getoutput(f'start {path}')
+
         except Exception as e:
             print(e)
 

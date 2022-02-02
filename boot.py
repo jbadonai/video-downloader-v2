@@ -208,6 +208,16 @@ class LoadEngines():
         self.threadController = myself.threadController
         self.flipper = False
 
+    def stop(self):
+        for thread in self.threadController:
+            self.threadController[thread].stop()
+            try:
+                self.threadController[thread].timer.stop()
+                self.threadController[thread].emergencyStop = True
+            except:
+                pass
+            # thread.terminate()
+
     def load_internet_checker_engine(self):
         self.flipper = True
         backupStyle_button = self.my_self.buttonInternetConnection.styleSheet()
@@ -263,7 +273,7 @@ class LoadEngines():
                 print(f"An Error occurred in boot > LoadEngines > statistics getter engine > get statistics connector :>>>\n{e}")
 
         try:
-            self.threadController['get statistics'] = GetStatisticsThread()
+            self.threadController['get statistics'] = GetStatisticsThread(self.my_self)
             self.threadController['get statistics'].start()
             self.threadController['get statistics'].any_signal.connect(get_statistics_connector)
         except Exception as e:

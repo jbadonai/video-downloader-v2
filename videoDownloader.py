@@ -18,11 +18,14 @@ import psutil
 import shutil
 from datetime import datetime, date
 import sys
-from jbavdLibrary import StyleSheet, VideoDatabase, GeneralFunctions
+from jbavdLibrary import StyleSheet, VideoDatabase, GeneralFunctions, ActivityStopperThread
 from userAction import UserActions
 from jbaMenu import JbaMenuClass as jba_menu
 
 restart_ready = False
+restart = False
+replaceDB = False
+dbReplacementFile = None
 
 
 
@@ -34,12 +37,14 @@ class ItemWindow(QMainWindow, my_item_window_interface_.Ui_MainWindow):
 
 
 class MainWindow(QMainWindow, my_interface_.Ui_MainWindow):
+
     def __init__(self):
         super(MainWindow, self).__init__()
         self.bootLoader = boot
 
         self.threadController = {}  # Create thread controller holds all threads so they can be shutdown when requrired
         self.database = VideoDatabase()  # create a database object
+
         self.generalFunctions = GeneralFunctions()  # create general function object
 
         self.interfaceLoader = self.bootLoader.LoadInterface(self)  # code for loading interface executes here
@@ -73,12 +78,17 @@ class MainWindow(QMainWindow, my_interface_.Ui_MainWindow):
 
         self.busy = False
         self.isReady = False
+        self.stopAllSuccessful = False
+
+        self.container = self.scrollAreaWidgetContents.layout()
 
         self.initialize()
         # self.generalFunctions.run_function(self.initialize)
         # self.scrollAreaWidgetContents.layout().addWidget()
 
     def initialize(self):
+        global restart
+        restart = False
         #   1.  Initialize the database: check required tables and create them if not existing
         self.message = "Initializing database..."
         print("Initializing database...")
@@ -104,10 +114,15 @@ class MainWindow(QMainWindow, my_interface_.Ui_MainWindow):
             self.isReady = True
 
         #   4. load engines
-        self.engineLoader.load_internet_checker_engine()    # load internet availability checker engine
-        self.engineLoader.load_statistics_getter_engine()   # load statistics getter engine
-        # load download monitoring engine [ not implemented yet ]
-        self.engineLoader.load_downloader_engine()
+        # time.sleep(2)
+        # self.engineLoader.load_internet_checker_engine()    # load internet availability checker engine
+        self.generalFunctions.run_function(self.engineLoader.load_internet_checker_engine() )
+        # time.sleep(2)
+        # self.engineLoader.load_statistics_getter_engine()   # load statistics getter engine
+        self.generalFunctions.run_function(self.engineLoader.load_statistics_getter_engine() )
+        # time.sleep(2)
+        # self.engineLoader.load_downloader_engine()
+        self.generalFunctions.run_function(self.engineLoader.load_downloader_engine())
 
     def add_new_download(self):
         if self.busy is False:
@@ -173,6 +188,17 @@ class MainWindow(QMainWindow, my_interface_.Ui_MainWindow):
             return 'Error'
         pass
 
+    def browse_file_location(self):
+        try:
+            dl,_ = QFileDialog.getOpenFileName(self, "Open", "open location")
+            if dl != "":
+                print(dl)
+                return dl
+            else:
+                return None
+        except Exception as e:
+            print(f"An Error occurred in MainWindow > browse_file_location(): \n >>>{e}")
+
     def settings(self):
         self.show_settings_page()
 
@@ -192,15 +218,23 @@ class MainWindow(QMainWindow, my_interface_.Ui_MainWindow):
 
     def stop_all(self):
         def run():
+            self.stopAllSuccessful = False
             try:
                 for x in range(self.scrollAreaWidgetContents.layout().count()):
                     url = self.scrollAreaWidgetContents.layout().itemAt(x).widget().videoURL
                     # status = self.scrollAreaWidgetContents.layout().itemAt(x).widget().status
                     status = self.database.get_status(url)
+                    if status == 'list index out of range':
+                        break
                     title = self.scrollAreaWidgetContents.layout().itemAt(x).widget().title
                     if status != 'completed' and status != 'stopped':
                         self.database.set_status(url, 'stopped')
                         print(f"stopping '{title}'...")
+                        self.message = f"stopping '{title}'..."
+
+                    time.sleep(0.1)
+
+                self.stopAllSuccessful = True
             except Exception as e:
                 print(f"An error occurred in mainwindow > stop all > run: \n>>> {e}")
 
@@ -274,6 +308,66 @@ class MainWindow(QMainWindow, my_interface_.Ui_MainWindow):
         self.spinBox_MaxDownload.setValue(int(self.max_download_allowed))
         self.spinBox_MaxRetries.setValue(int(self.max_retries))
         self.textDefaultDownloadLocation.setText(self.default_download_location)
+
+    def get_index(self):
+        try:
+            if self.container.count() > 0:
+                for x in range(self.container.count()):
+                    title = self.container.itemAt(x).widget().title
+                    if str(title).strip().lower() == str(self.title).strip().lower():
+                        print(self.container.itemAt(x).widget().title)
+                        return x
+
+        except Exception as e:
+            print(f"An error occurred in Common > ItemWindow > get_index(): \n>>{e}")
+
+    def delete_index(self, index):
+        try:
+            self.container.itemAt(index).widget().deleteLater()
+        except Exception as e:
+            print(f"An error occurred in Common > ItemWindow > delete_index(): \n>>{e}")
+
+    def restart_application(self):
+        global restart
+        restart = True
+        self.close()
+
+    def replace_database(self, new_database, old_database):
+
+        try:
+            self.stop_all_thread(new_database, old_database)
+            # self.engineLoader.stop()
+
+        except Exception as e:
+            print(f'semi final error: {e}')
+
+    def stop_all_thread(self, new_database, old_database):
+
+        def connector(data):
+            global replaceDB
+            global dbReplacementFile
+            if 'message' in data:
+                self.message = data['message']
+                self.labelInfo.setText(self.message)
+
+            if 'completed' in data:
+                self.hide()
+                replaceDB = True
+                dbReplacementFile = (new_database, old_database)
+
+                QMessageBox.information(self, 'Restat',
+                                        'Application will now restart to load the backup database. Please wait.')
+
+                self.close()
+            pass
+
+        try:
+            self.x = ActivityStopperThread(self)
+            self.x.start()
+            self.x.any_signal.connect(connector)
+
+        except Exception as e:
+            print(f'final error: {e}')
 
     def mousePressEvent(self, event):
         try:
@@ -355,6 +449,10 @@ class MainWindow(QMainWindow, my_interface_.Ui_MainWindow):
 
 
 def start():
+    global restart
+    global replaceDB
+    global dbReplacementFile
+
     if __name__ == '__main__':
         app = QApplication([])
         app.setStyle('fusion')
@@ -363,6 +461,22 @@ def start():
         win.show()
 
         app.exec_()
+        if restart is True:
+            time.sleep(1)
+            start()
+
+        if replaceDB is True:
+            try:
+                new_database = dbReplacementFile[0]
+                old = dbReplacementFile[1]
+                time.sleep(1)
+                shutil.copy(new_database, old)
+                replaceDB = False
+                time.sleep(1)
+                start()
+            except:
+                start()
+                pass
 
 
 start()

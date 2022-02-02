@@ -82,7 +82,6 @@ class UserActions():
                         # self.videoFormatLayout.layout().addWidget(self.rb)
                         self.myself.scrollAreaWidgetContents_VideoFormat.layout().addWidget(self.rb)
                         # container.addWidget(self.rb)
-
                 if 'url_exists' in data:
                     # if url exists in database do not proceed.
                     url = str(data["url"])

@@ -542,6 +542,9 @@ class VideoDatabase():
         super(VideoDatabase, self).__init__()
         self.dbname = 'jbacfg'
 
+    def set_db_filename(self, filename):
+        self.dbname = filename
+
     def create_video_database(self):
         ''' create video table in the database '''
         try:
@@ -757,16 +760,17 @@ class VideoDatabase():
 
     def get_status(self, url):
         ''' gets status of the specified url '''
-        try:
-            connection = sqlite3.connect(self.dbname)
-            cursor = connection.cursor()
+        # try:
+        connection = sqlite3.connect(self.dbname)
+        cursor = connection.cursor()
 
-            cursor.execute('select status from VideoData where url = ? ', (url,))
-            data = cursor.fetchall()
+        cursor.execute('select status from VideoData where url = ? ', (url,))
+        data = cursor.fetchall()
 
-            return data[0][0]
-        except Exception as e:
-            print(f"An error occurred in database module ' GET STATUS' : {e}")
+        return data[0][0]
+        # except Exception as e:
+        #     print(f"An error occurred in database module ' GET STATUS' : {e}")
+        #     return 'e'
 
     def get_status_by_playlist_url(self, playlist_url):
         ''' gets status of the specified url '''
@@ -983,13 +987,14 @@ class GetStatisticsThread(QtCore.QThread):
     ''' add provided items to the format list window represented by container '''
     any_signal = QtCore.pyqtSignal(dict)
 
-    def __init__(self, parent=None):
+    def __init__(self,myself, parent=None):
         super(GetStatisticsThread, self).__init__(parent)
         try:
+            self.my_parent = myself
             self.is_running = False
             self.is_waiting_download = False
             self.is_max_download_exceeded = False
-            self.db = VideoDatabase()
+            self.db = self.my_parent.database
             self.max_download_allowed = int(self.db.get_settings('max_download'))
             self.max_retries = int(self.db.get_settings('max_retries'))
             self.default_download_location = self.db.get_settings('default_download_location')
@@ -1013,6 +1018,7 @@ class GetStatisticsThread(QtCore.QThread):
         try:
             while True:
                 if self.is_running is False:
+                    print('STOPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP')
                     break
                 waiting_number = self.db.get_waiting_number()  # retrieve waiting number from the database
                 completed_number = self.db.get_completed_number()  # retrieve completed number from the database
@@ -1022,7 +1028,9 @@ class GetStatisticsThread(QtCore.QThread):
                 self.max_download_allowed = int(self.db.get_settings('max_download'))
                 self.max_retries = int(self.db.get_settings('max_retries'))
                 self.default_download_location = self.db.get_settings('default_download_location')
-
+                if self.is_running is False:
+                    print('STOPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP')
+                    break
                 # check and set value indicating that there are download still waiting to start downloading
                 if waiting_number > 0:
                     self.is_waiting_download = True
@@ -1049,6 +1057,9 @@ class GetStatisticsThread(QtCore.QThread):
                 }
                 # print(f"Emitting data : {data}")
                 self.any_signal.emit(data)
+                if self.is_running is False:
+                    print('STOPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP')
+                    break
                 time.sleep(1)
             print(f'[XX] Getstatistics thread stopped.')
         except Exception as e:
@@ -2019,6 +2030,9 @@ class DownloadMonitoringEngineThread(QtCore.QThread):
                                                 url = self.my_parent.scrollAreaWidgetContents.layout().itemAt(
                                                     x).widget().videoURL
                                                 status = self.db.get_status(url)
+                                                if status == 'list index out of range':
+                                                    break
+
                                                 counter += 1
                                                 if counter > self.max_download_allowed:
                                                     if status == 'downloading':
@@ -2048,6 +2062,8 @@ class DownloadMonitoringEngineThread(QtCore.QThread):
                                             url = self.my_parent.scrollAreaWidgetContents.layout().itemAt(
                                                 x).widget().videoURL
                                             status = self.db.get_status(url)
+                                            if status == 'list index out of range':
+                                                break
                                             counter += 1
                                             if counter > self.max_download_allowed:
                                                 if status == 'downloading':
@@ -2413,7 +2429,6 @@ class ActivityStopperThread(QtCore.QThread):
             self.my_self = myself
             self.message = ""
             self.data={}
-            print('here!')
         except Exception as e:
             print(f'Error in init: {e}')
 
@@ -2442,25 +2457,23 @@ class ActivityStopperThread(QtCore.QThread):
                         self.my_self.scrollAreaWidgetContents.layout().itemAt(x).widget().stop_downloading()
                         self.message = f"stopping {self.my_self.scrollAreaWidgetContents.layout().itemAt(x).widget().title}'..."
                         self.data['message'] = self.message
+                        print(self.message)
                         self.any_signal.emit(self.data)
-                        time.sleep(0.5)
-
-
+                        time.sleep(0.1)
             time.sleep(1)
             # stop all running thread
             total = len(self.my_self.threadController)
             for index, thread in enumerate(self.my_self.threadController):
-                self.message = f"[{index+1}/{total}]Stopping thread '{thread}'..."
+                self.message = f"[{round(((index + 1)/total) *100)}%] Preparing to Restore. Please wait... '{thread}'..."
+                print(f"[{index+1}/{total}]Stopping thread '{thread}'...")
                 self.data['message'] = self.message
                 self.any_signal.emit(self.data)
                 self.my_self.threadController[thread].stop()
                 # thread.stop()
-                time.sleep(1)
+                time.sleep(0.1)
 
             time.sleep(1)
             self.data['completed'] = True
             self.any_signal.emit(self.data)
-
-
         except Exception as e:
             self.is_running = False
