@@ -6,7 +6,7 @@ from PyQt5.QtGui import QColor, QIcon
 from ui import my_interface_, my_item_window_interface_
 import boot
 
-
+import time
 from win10toast import ToastNotifier
 import pyautogui
 import psutil
@@ -184,6 +184,8 @@ class LoadDataFromDB():
 
                     print('data loading completed')
                     self.my_self.message = "Data loading Completed successfully"
+                    # print('waiting for 5 sec')
+                    # time.sleep(0.5)
                     self.my_self.isReady = True
 
             except Exception as e:
@@ -252,7 +254,7 @@ class LoadEngines():
                 print(f"An Error occurred in boot > LoadEngines > load internet checker engine > internet checker connector:>>>\n{e}")
 
         try:
-            self.threadController['internet checker'] = IsInternetThread()
+            self.threadController['internet checker'] = IsInternetThread(self.my_self)
             self.threadController['internet checker'].start()
             self.threadController['internet checker'].any_signal.connect(internet_checker_connector)
         except Exception as e:

@@ -138,53 +138,52 @@ class ItemWindow(QMainWindow, my_item_window_interface_.Ui_MainWindow):
         pass
 
     def start_downloading(self):
-        # time.sleep(20)
+
+        def item_downloading_connector(data):
+            try:
+                # print("Received data>>>>>>>>>>>>", data)
+                # print(f"Receiving signal for {self.title}: {data}")
+                self.textETA.setText(data['eta'])
+                self.textDownloaded.setText(data['downloaded'])
+                self.textSpeed.setText(data['speed'])
+                self.textSize.setText(data['size'])
+                try:
+                    percentage = data['percent']
+                    percentage = str(percentage).replace("%", "")
+                    percentage = int(float(percentage).__round__())
+                    # print(f"percentage: {percentage}", type(percentage))
+                    self.progressBar.setValue(percentage)
+                except Exception as e:
+                    print(f'Error in percentage: {e}')
+
+                if data['already_downloaded'] is True:
+                    print("File already downloaded. Thanks")
+                    self.database.set_status(self.videoURL, 'completed')
+                    print("done!")
+                    self.threadController[f"{str(self.title[:10]).strip().replace(' ', '_')}"].stop()
+                    # self.timer.stop()
+
+                if data['completed'] is True:
+                    print("Download Completed. Thanks")
+                    self.database.set_status(self.videoURL, 'completed')
+                    print("done!")
+                    self.threadController[f"{str(self.title[:10]).strip().replace(' ', '_')}"].stop()
+
+                if data['emergency_stop'] is True:
+                    print("Emergency stopped. thanks")
+                    self.database.set_status(self.videoURL, 'stopped')
+                    self.threadController[f"{str(self.title[:10]).strip().replace(' ', '_')}"].stop()
+
+            except Exception as e:
+                print(
+                    f'An Error Occurred in Common > ItemWindow > Start_downloading > item_downloading_conector: for [{self.title}]\n >>{e}')
+            pass
+
         if self.downloadingInProgress is False:
             print("Ready Now! Start downloading.")
-            print(f'downloading triggered for: {self.videoURL}')
+            print(f'[wiating ]downloading triggered for: {self.videoURL}')
             self.downloadingInProgress = True
             self.emergencyStop = False
-            # print("Now Downloading...")
-
-            def item_downloading_connector(data):
-                try:
-                    # print(data)
-                    # print(f"Receiving signal for {self.title}: {data}")
-                    self.textETA.setText(data['eta'])
-                    self.textDownloaded.setText(data['downloaded'])
-                    self.textSpeed.setText(data['speed'])
-                    self.textSize.setText(data['size'])
-                    try:
-                        percentage = data['percent']
-                        percentage = str(percentage).replace("%","")
-                        percentage = int(float(percentage).__round__())
-                        # print(f"percentage: {percentage}", type(percentage))
-                        self.progressBar.setValue(percentage)
-                    except Exception as e:
-                        print(f'Error in percentage: {e}')
-
-                    if data['already_downloaded'] is True:
-
-                        print("File already downloaded. Thanks")
-                        self.database.set_status(self.videoURL, 'completed')
-                        print("done!")
-                        self.threadController[f"{str(self.title[:10]).strip().replace(' ','_')}"].stop()
-                        # self.timer.stop()
-
-                    if data['completed'] is True:
-                        print("Download Completed. Thanks")
-                        self.database.set_status(self.videoURL, 'completed')
-                        print("done!")
-                        self.threadController[f"{str(self.title[:10]).strip().replace(' ','_')}"].stop()
-
-                    if data['emergency_stop'] is True:
-                        print("Emergency stopped. thanks")
-                        self.database.set_status(self.videoURL, 'stopped')
-                        self.threadController[f"{str(self.title[:10]).strip().replace(' ','_')}"].stop()
-
-                except Exception as e:
-                    print(f'An Error Occurred in Common > ItemWindow > Start_downloading > item_downloading_conector: for [{self.title}]\n >>{e}')
-                pass
 
             try:
                 self.threadController[f"{str(self.title[:10]).strip().replace(' ','_')}"] = ItemWindowDownloaderEngine(self.downloadData, self)
@@ -226,7 +225,12 @@ class ItemWindow(QMainWindow, my_item_window_interface_.Ui_MainWindow):
             print(f"An error occurred in Common > ItemWindow > delete_index(): \n>>{e}")
 
     def timerEvent(self, e):
+        # print(f"i'm running for {self.title}")
         try:
+            if self.myself.dbResetActivated is True:
+                self.stop_downloading()
+                self.timer.stop()
+
             self.status = self.database.get_status(self.videoURL)
 
             self.textStatus.setText(self.status)
@@ -234,9 +238,14 @@ class ItemWindow(QMainWindow, my_item_window_interface_.Ui_MainWindow):
             # if self.dataLoadingCompleted is True:
             if self.status == 'downloading':
                 if self.myself.isReady is True:
+                    # if self.downloadingInProgress is False:
+                    #     self.downloadingInProgress = True
+                    #     print(f'>>>>>>>start downloading {self.title}')
                     self.start_downloading()
+                    # self.functions.run_function(self.start_downloading)
                 else:
-                    print("parent not ready...")
+                    # print("parent not ready...")
+                    pass
 
                 pass
 

@@ -40,51 +40,54 @@ class MainWindow(QMainWindow, my_interface_.Ui_MainWindow):
 
     def __init__(self):
         super(MainWindow, self).__init__()
-        self.bootLoader = boot
+        try:
+            self.bootLoader = boot
 
-        self.threadController = {}  # Create thread controller holds all threads so they can be shutdown when requrired
-        self.database = VideoDatabase()  # create a database object
+            self.threadController = {}  # Create thread controller holds all threads so they can be shutdown when requrired
+            self.database = VideoDatabase()  # create a database object
 
-        self.generalFunctions = GeneralFunctions()  # create general function object
+            self.generalFunctions = GeneralFunctions()  # create general function object
 
-        self.interfaceLoader = self.bootLoader.LoadInterface(self)  # code for loading interface executes here
-        self.dataLoader = self.bootLoader.LoadDataFromDB(self)  # code for loading data from database executes here
-        self.engineLoader = self.bootLoader.LoadEngines(self)   #   controls engine loading
+            self.interfaceLoader = self.bootLoader.LoadInterface(self)  # code for loading interface executes here
+            self.dataLoader = self.bootLoader.LoadDataFromDB(self)  # code for loading data from database executes here
+            self.engineLoader = self.bootLoader.LoadEngines(self)   #   controls engine loading
 
-        self.my_menu = jba_menu(self)   # create instance of menu content and it's functions.
-        self.userAction = UserActions(self)
+            self.my_menu = jba_menu(self)   # create instance of menu content and it's functions.
+            self.userAction = UserActions(self)
 
-        #   initialize download monitoring variables
-        self.totalNumber = 0
-        self.numberCompleted = 0
-        self.numberStopped = 0
-        self.numberWaiting = 0
-        self.numberDownloading = 0
+            #   initialize download monitoring variables
+            self.totalNumber = 0
+            self.numberCompleted = 0
+            self.numberStopped = 0
+            self.numberWaiting = 0
+            self.numberDownloading = 0
 
-        # settings that controls downloads
-        self.max_download_allowed = 0
-        self.is_max_download_exceeded = True
-        self.max_retries = 0
-        self.default_download_location = None
-        self.is_there_waiting_download = False
+            # settings that controls downloads
+            self.max_download_allowed = 0
+            self.is_max_download_exceeded = True
+            self.max_retries = 0
+            self.default_download_location = None
+            self.is_there_waiting_download = False
 
-        self.statistics_data = {}  # holds the statistics data that will be transmitted by load statistics getter engine
+            self.statistics_data = {}  # holds the statistics data that will be transmitted by load statistics getter engine
 
-        self.message = "Info"
-        self.timer = QBasicTimer()
-        self.timer.start(200, self)
+            self.message = "Info"
+            self.timer = QBasicTimer()
+            self.timer.start(200, self)
 
-        self.is_internet = False
+            self.is_internet = False
 
-        self.busy = False
-        self.isReady = False
-        self.stopAllSuccessful = False
+            self.busy = False
+            self.isReady = False
+            self.stopAllSuccessful = False
+            self.dbResetActivated = False
 
-        self.container = self.scrollAreaWidgetContents.layout()
+            self.container = self.scrollAreaWidgetContents.layout()
 
-        self.initialize()
-        # self.generalFunctions.run_function(self.initialize)
-        # self.scrollAreaWidgetContents.layout().addWidget()
+            self.initialize()
+            # self.generalFunctions.run_function(self.initialize)
+        except Exception as e:
+            print(f"An Error Occurred in Main Window Init()")
 
     def initialize(self):
         global restart
@@ -100,6 +103,7 @@ class MainWindow(QMainWindow, my_interface_.Ui_MainWindow):
         print("Checking content of the database...")
         # time.sleep(0.2)
         total_data = self.database.get_total_number()    # get total no data in the database
+        print(f'total:::: {total_data}')
         if total_data > 0:  # which implies there is data in the database
             #   3a. Load all data in the database
             self.message = "Loading Items from Database..."
@@ -114,14 +118,12 @@ class MainWindow(QMainWindow, my_interface_.Ui_MainWindow):
             self.isReady = True
 
         #   4. load engines
-        # time.sleep(2)
-        # self.engineLoader.load_internet_checker_engine()    # load internet availability checker engine
-        self.generalFunctions.run_function(self.engineLoader.load_internet_checker_engine() )
-        # time.sleep(2)
-        # self.engineLoader.load_statistics_getter_engine()   # load statistics getter engine
-        self.generalFunctions.run_function(self.engineLoader.load_statistics_getter_engine() )
-        # time.sleep(2)
-        # self.engineLoader.load_downloader_engine()
+
+        self.generalFunctions.run_function(self.engineLoader.load_internet_checker_engine())
+        #
+        self.generalFunctions.run_function(self.engineLoader.load_statistics_getter_engine())
+        # self.engineLoader.load_statistics_getter_engine()
+
         self.generalFunctions.run_function(self.engineLoader.load_downloader_engine())
 
     def add_new_download(self):
@@ -130,6 +132,7 @@ class MainWindow(QMainWindow, my_interface_.Ui_MainWindow):
             self.userAction.add_new_download()
         else:
             QMessageBox.information(self, "Wait", "Please wait for data acquisition to be completed or Cancel")
+            self.show_add_new_page()
         pass
 
     def filter(self):
@@ -203,7 +206,10 @@ class MainWindow(QMainWindow, my_interface_.Ui_MainWindow):
         self.show_settings_page()
 
     def settings_cancel(self):
-        self.show_download_page()
+        if self.busy is True:
+            self.show_add_new_page()
+        else:
+            self.show_download_page()
 
     def settings_ok(self):
         try:
@@ -211,7 +217,10 @@ class MainWindow(QMainWindow, my_interface_.Ui_MainWindow):
             self.database.update_setting('max_retries', int(self.spinBox_MaxRetries.value()))
             self.database.update_setting('default_download_location', self.textDefaultDownloadLocation.text())
 
-            self.show_download_page()
+            if self.busy is True:
+                self.show_add_new_page()
+            else:
+                self.show_download_page()
         except Exception as e:
             print(f"An Error Occurred in MainWindow > settings_ok")
         pass
@@ -289,6 +298,7 @@ class MainWindow(QMainWindow, my_interface_.Ui_MainWindow):
             self.userAction.add_new_ok()
         else:
             QMessageBox.information(self,"Wait","Please wait for data acquisition to be completed or Cancel")
+            self.show_add_new_page()
         pass
 
     def scrollToBottom(self):
@@ -423,15 +433,19 @@ class MainWindow(QMainWindow, my_interface_.Ui_MainWindow):
             print(f"An Error Occurred in MainWindow > contextMenuEvent: \n >>> {e}")
 
     def timerEvent(self, a0):
-        # constantly communicate to the use
-        self.labelInfo.setText(self.message)
+        try:
+            # constantly communicate to the use
+            self.labelInfo.setText(self.message)
 
-        # getting and updating statistics
-        self.is_there_waiting_download = self.statistics_data['is_waiting_download']
-        self.is_max_download_exceeded = self.statistics_data['is_max_download_exceeded']
-        self.max_download_allowed = self.statistics_data['max_download_allowed']
-        self.max_retries = self.statistics_data['max_retries']
-        self.default_download_location = self.statistics_data['default_download_location']
+            # getting and updating statistics
+            self.is_there_waiting_download = self.statistics_data['is_waiting_download']
+            self.is_max_download_exceeded = self.statistics_data['is_max_download_exceeded']
+            self.max_download_allowed = self.statistics_data['max_download_allowed']
+            self.max_retries = self.statistics_data['max_retries']
+            self.default_download_location = self.statistics_data['default_download_location']
+        except Exception as e:
+            # print(f"An error occurred in mainwindow timer event: \n>>>{e}")
+            pass
 
     def closeEvent(self, e):
         try:
@@ -467,8 +481,21 @@ def start():
 
         if replaceDB is True:
             try:
+                print(dbReplacementFile, "<><>[][]<><>[][]")
                 new_database = dbReplacementFile[0]
                 old = dbReplacementFile[1]
+                while True:
+                    print('removing old database.....')
+                    time.sleep(0.2)
+                    try:
+                        if os.path.exists('jbacfg'):
+                            os.remove('jbacfg')
+                            break
+                        else:
+                            break
+                    except Exception as e:
+                        print(e)
+                        continue
                 time.sleep(1)
                 shutil.copy(new_database, old)
                 replaceDB = False

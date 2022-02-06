@@ -196,10 +196,12 @@ class JbaMenuClass():
                                                    "Are you sure you want to replace current data with this one?",
                                                    QMessageBox.Yes | QMessageBox.No)
                         if ans == QMessageBox.Yes:
+                            self.my_parent.dbResetActivated = True
                             # self.my_parent.buttonStopAll.click()
                             # time.sleep(1)
                             # self.my_parent.buttonStopAll.click()
                             # time.sleep(1)
+                            self.my_parent.threadController['download_engine'].stop()
 
                             new_database = file
                             to_be_replaced = filename
@@ -217,6 +219,7 @@ class JbaMenuClass():
         ans = QMessageBox.question(self.my_parent, "Reset Database", "This action will permanently delete all download data.\n"
                                                                      "Proceed with the reset?", QMessageBox.Yes | QMessageBox.No)
         if ans == QMessageBox.Yes:
+            self.my_parent.dbResetActivated = True
             d = round(time.time())
 
             if os.path.exists('jrb') is False:
@@ -321,14 +324,29 @@ class JbaMenuClass():
 
     def open_in_explorer(self):
         try:
-            path = os.path.normpath(f"{self.my_parent.myself.default_download_location}\\")
+            # path = os.path.normpath(f"{self.my_parent.myself.default_download_location}\\")
+            path = os.path.normpath(f"{self.my_parent.downloadLocation}\\")
             print(path)
-            if self.my_parent.downloadVideo is True:
-                filename = f"{self.my_parent.title}.mp4"
-            else:
-                filename = f"{self.my_parent.title}.mp3"
+            print(self.my_parent.downloadLocation)
+
+            if self.my_parent.isPlaylist is True:
+                path = os.path.join(path, self.my_parent.playlistTitle)
+
+            filename = None
+            nameToFind = self.my_parent.title
+            for root, dirs, files in os.walk(path):
+                for file in files:
+                    if str(file).__contains__(nameToFind):
+                        filename = file
+                        break
+
+            # if self.my_parent.downloadVideo is True:
+            #     filename = f"{self.my_parent.title}.mp4"
+            # else:
+            #     filename = f"{self.my_parent.title}.mp3"
 
             fullFilePath = os.path.join(path, filename)
+            print(fullFilePath)
 
             # os.popen(self.downloadLocation)
             # subprocess.Popen(f'explorer {self.downloadLocation}')
@@ -341,7 +359,7 @@ class JbaMenuClass():
                                                                           'download is yet to be completed.\n\n'
                                                                           'Please restart the download if not '
                                                                           'in progress.')
-                subprocess.getoutput(f'start {path}')
+                # subprocess.getoutput(f'start {path}')
 
         except Exception as e:
             print(e)

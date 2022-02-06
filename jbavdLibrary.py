@@ -950,12 +950,13 @@ class IsInternetThread(QtCore.QThread):
 
     any_signal = QtCore.pyqtSignal(dict)
 
-    def __init__(self, parent=None):
+    def __init__(self,myself, parent=None):
         super(IsInternetThread, self).__init__(parent)
         self.is_running = False
         self.is_internet = False
         self.general_functions = GeneralFunctions()
         self.data ={}
+        self.myself = myself
 
     def stop(self):
         ''' stops the thread '''
@@ -971,13 +972,21 @@ class IsInternetThread(QtCore.QThread):
         self.is_running = True
         try:
             while True:
-                if self.is_running is False:
+                print(f"internet connection thread is waiting for parent to be ready...")
+                if self.myself.isReady is True:
                     break
-                self.is_internet = self.general_functions.IsInternet()
-                self.data['is_internet'] = self.is_internet
-                self.any_signal.emit(self.data)
-                time.sleep(0.5)
-                pass
+                time.sleep(1)
+
+            while True:
+                if self.myself.isReady  is True:
+                    if self.is_running is False:
+                        break
+                    self.is_internet = self.general_functions.IsInternet()
+                    self.data['is_internet'] = self.is_internet
+                    self.any_signal.emit(self.data)
+                    time.sleep(0.5)
+                    pass
+
             print(f'[XX] Internet thread stopped.')
         except Exception as e:
             self.is_running = False
@@ -1016,6 +1025,12 @@ class GetStatisticsThread(QtCore.QThread):
         self.is_running = True
         print(f"[x] starting GetStatisticsThread...")
         try:
+            while True:
+                print(f"get statistics thread is waiting for parent to be ready...")
+                if self.my_parent.isReady is True:
+                    break
+                time.sleep(3)
+
             while True:
                 if self.is_running is False:
                     print('STOPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP')
@@ -1060,7 +1075,7 @@ class GetStatisticsThread(QtCore.QThread):
                 if self.is_running is False:
                     print('STOPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP')
                     break
-                time.sleep(1)
+                time.sleep(0.5)
             print(f'[XX] Getstatistics thread stopped.')
         except Exception as e:
             print(f"An error occurred in run: {e}")
@@ -1079,7 +1094,7 @@ class LoadDataFromDatabaseThread(QtCore.QThread):
             self.item_list = items
             self.general_function = GeneralFunctions()
         except Exception as e:
-            print(f"An Error occurred in Common > AddDownloadItemsThread > Init(): \n >>>{e}")
+            print(f"An Error occurred in  LoadDataFromDatabaseThread > Init(): \n >>>{e}")
 
     def stop(self):
         try:
@@ -1963,7 +1978,7 @@ class DownloadMonitoringEngineThread(QtCore.QThread):
     def stop(self):
         ''' stops the thread '''
         self.is_running = False
-        time.sleep(1)
+        # time.sleep(1)
         self.terminate()
         print(f"[] Downloader Engine Stopped.")
 
@@ -1998,25 +2013,64 @@ class DownloadMonitoringEngineThread(QtCore.QThread):
         print('[x] Downloader Monitoring Engine Started...')
         try:
             while True:
+                print(f"download monitoring thread is waiting for parent to be ready...")
+                if self.my_parent.isReady is True:
+                    break
+                time.sleep(3)
+
+            while True:
                 if self.is_running is False:
                     break
                 # print("[][] downloader engine running")
-                ans = self.get_statistics()
-                if ans != 'error':
-                    if self.is_waiting_download is True:  # check if there are waiting downloads
-                        # print("waiting download found..........")
-                        if self.is_max_download_exceeded is False:  # check if max download limit has not been exceeded
+                if self.is_running is True:
+                    ans = self.get_statistics()
+                    if ans != 'error':
+                        if self.is_waiting_download is True:  # check if there are waiting downloads
+                            # print("waiting download found..........")
+                            if self.is_max_download_exceeded is False:  # check if max download limit has not been exceeded
 
-                            data = self.db.get_next_waiting_data()  # get next waiting data
-                            nextWaitingData = self.functions.purify_raw_data_from_database_list(
-                                data)  # reformat the waiting data
-                            self.any_signal.emit(nextWaitingData)
-                            time.sleep(2) #  small delay before auto starting the next one
-                            self.db.set_status(nextWaitingData['url'],
-                                               'downloading')  # change status of the next waiting to downloading
+                                data = self.db.get_next_waiting_data()  # get next waiting data
+                                nextWaitingData = self.functions.purify_raw_data_from_database_list(
+                                    data)  # reformat the waiting data
+                                self.any_signal.emit(nextWaitingData)
+                                time.sleep(2) #  small delay before auto starting the next one
+                                self.db.set_status(nextWaitingData['url'],
+                                                   'downloading')  # change status of the next waiting to downloading
+
+                            else:
+                                # print("max download allowed exceeded. Rechecking.........")
+                                try:
+                                    if self.downloading_number > self.max_download_allowed:
+
+                                        counter = 0
+                                        try:
+
+                                            if self.my_parent.scrollAreaWidgetContents.layout().count() > 0:
+                                                for x in range(self.my_parent.scrollAreaWidgetContents.layout().count()):
+                                                    # status = self.my_parent.scrollAreaWidgetContents.layout().itemAt(
+                                                    #     x).widget().textStatus.text()
+                                                    url = self.my_parent.scrollAreaWidgetContents.layout().itemAt(
+                                                        x).widget().videoURL
+                                                    status = self.db.get_status(url)
+                                                    if status == 'list index out of range':
+                                                        break
+
+                                                    counter += 1
+                                                    if counter > self.max_download_allowed:
+                                                        if status == 'downloading':
+                                                            self.my_parent.database.set_status(url, 'waiting')
+
+                                        except Exception as e:
+                                            print(f"An error occurred in 'clear download item': \n{e}")
+                                        pass
+                                except:
+                                    print(f"An error occurred while sanitizing")
+
+                                # print("there are pending downloads but no slots to start them")
+                                pass
 
                         else:
-                            # print("max download allowed exceeded. Rechecking.........")
+                            # print("No waiting download")
                             try:
                                 if self.downloading_number > self.max_download_allowed:
 
@@ -2032,7 +2086,6 @@ class DownloadMonitoringEngineThread(QtCore.QThread):
                                                 status = self.db.get_status(url)
                                                 if status == 'list index out of range':
                                                     break
-
                                                 counter += 1
                                                 if counter > self.max_download_allowed:
                                                     if status == 'downloading':
@@ -2043,42 +2096,11 @@ class DownloadMonitoringEngineThread(QtCore.QThread):
                                     pass
                             except:
                                 print(f"An error occurred while sanitizing")
-
-                            # print("there are pending downloads but no slots to start them")
                             pass
 
-                    else:
-                        # print("No waiting download")
-                        try:
-                            if self.downloading_number > self.max_download_allowed:
-
-                                counter = 0
-                                try:
-
-                                    if self.my_parent.scrollAreaWidgetContents.layout().count() > 0:
-                                        for x in range(self.my_parent.scrollAreaWidgetContents.layout().count()):
-                                            # status = self.my_parent.scrollAreaWidgetContents.layout().itemAt(
-                                            #     x).widget().textStatus.text()
-                                            url = self.my_parent.scrollAreaWidgetContents.layout().itemAt(
-                                                x).widget().videoURL
-                                            status = self.db.get_status(url)
-                                            if status == 'list index out of range':
-                                                break
-                                            counter += 1
-                                            if counter > self.max_download_allowed:
-                                                if status == 'downloading':
-                                                    self.my_parent.database.set_status(url, 'waiting')
-
-                                except Exception as e:
-                                    print(f"An error occurred in 'clear download item': \n{e}")
-                                pass
-                        except:
-                            print(f"An error occurred while sanitizing")
-                        pass
-
-                time.sleep(2)
-
-
+                    time.sleep(2)
+                else:
+                    break
         except Exception as e:
             print(f"An error occurred in LOAD ENGINE : {e}")
 
@@ -2139,16 +2161,18 @@ class ItemWindowDownloaderEngine(QtCore.QThread):
         print(f"[] ItemWindowDownloaderEngine Stopped..")
 
     def run(self):
+        # time.sleep(0.2)
         self.is_running = True
-        print("[x] Staring ItemWindowDownloaderEngine..")
+        print(f"[x] Staring ItemWindowDownloaderEngine..{self.title}")
         self.downloadCompleted = False
-        self.downloadLocation = self.db.get_settings('default_download_location')
+        # self.downloadLocation = self.db.get_settings('default_download_location')
+        self.downloadLocation = self.downloadLocation
 
         try:
             if self.downloadFormat is None:
                 self.functions.run_function(self.download, False, self.videoURL, self.downloadLocation)
             else:
-                self.functions.run_function(self.download, False, self.videoURL, self.downloadLocation, self.my_parent.downloadFormat)
+                self.functions.run_function(self.download, False, self.videoURL, self.downloadLocation, self.downloadFormat)
 
             while True:
                 if self.is_running is False:
@@ -2198,6 +2222,7 @@ class ItemWindowDownloaderEngine(QtCore.QThread):
                     # self.stop()
                     break
                 else:
+                    # print(f'emmitted datttaaaa: {self.emitData}')
                     self.any_signal.emit(self.emitData)
 
                 time.sleep(1)
@@ -2334,6 +2359,8 @@ class ItemWindowDownloaderEngine(QtCore.QThread):
             except:
                 self._percent = "100%"
 
+
+
         except EmergencyError:
             signal.signal(signal.SIGTERM, self.my_hook)
             self.Logger.loggerEmergencyStop = False
@@ -2350,6 +2377,13 @@ class ItemWindowDownloaderEngine(QtCore.QThread):
             full_download_path = os.path.join(os.getcwd(), directory)
             if os.path.exists(full_download_path) is False:
                 os.makedirs(full_download_path)
+
+        if video_format != 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best':
+            video_format = str(video_format).split(" ")[0].strip()
+
+        print(f"selected format  is ::::::::::::{video_format}")
+
+
 
         # set the output template depending on wether the url is playlist or not
         if self.isPlaylist:
