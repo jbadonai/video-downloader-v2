@@ -233,7 +233,34 @@ class StyleSheet():
         color:rgb(255, 255, 255);
         cursor:"Pointing Hand";
         }
-    
+        
+        #frame_settings_title, #frame_new_download_title{
+         border-left: 3px solid white;
+        border-bottom: 3px solid white;
+        border-right: 3px solid white;
+        border-radius:15px;
+        margin-top:-10px;
+        margin-bottom:20px;
+        padding-top:10px;
+        padding-left:40px;
+        padding-right:40px;
+        padding-bottom:10px;
+        background-color: rgb(55,55,55);
+              
+        }
+        
+        /*
+        #frame_settings_title, #frame_new_download_title{
+        padding:5px;
+        margin-bottom:15px;
+        margin-top:5px;
+        margin-right:15px;
+        border-bottom: 3px solid rgb(255, 255, 255);
+        border-top: 3px solid rgb(255, 255, 255);
+        background:transparent;
+        border-radius:10px;        
+        }
+        */
     
         #frame_leftTop{
         background-color: rgb(30, 30, 30);
@@ -344,7 +371,7 @@ class GeneralFunctions():
         d['download_all']= dbList[2]
         d['format']= dbList[3]
         d['url']= dbList[4]
-        d['title']= dbList[5]
+        d['title']=self.screen_title(dbList[5])
         d['is_playlist']= dbList[6]
         d['playlist_index']= dbList[7]
         d['playlist_title']= dbList[8]
@@ -367,6 +394,10 @@ class GeneralFunctions():
             if c.isalnum() or c.isalpha() or c.isspace() or c.isnumeric() or c.isdigit() or c.isidentifier():
                 final = final + c  # add the accepted character to the final result
 
+        print('[][]][][][][][][][][][][][][][][][]][')
+        print(f'original title = : {title}')
+        print(f'Screened title = : {final}')
+        print('[][]][][][][][][][][][][][][][][][]][')
         return final  # return the final result
 
     def purify_raw_data_from_database_dict(self, d: dict):

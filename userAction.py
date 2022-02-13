@@ -146,12 +146,13 @@ class UserActions():
                 #     items.append(i)
                 # # add the data to item window and visual dispaly
                 # print(data)
+                data = self.generalFunction.purify_raw_data_from_database_dict(data)
+
                 win = ItemWindow(data=data, my_parent=myparent)
                 self.myself.scrollAreaWidgetContents.layout().addWidget(win)
 
                 self.ready = True
 
-                data = self.generalFunction.purify_raw_data_from_database_dict(data)
                 self.database.insert_into_video_database(data)
 
             except Exception as e:

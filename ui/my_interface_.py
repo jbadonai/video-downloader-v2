@@ -140,17 +140,7 @@ class Ui_MainWindow(object):
 "margin:15px;\n"
 "}\n"
 "\n"
-"#frame_settings_title, #frame_new_download_title{\n"
-"padding:5px;\n"
-"margin-bottom:15px;\n"
-"margin-top:5px;\n"
-"margin-right:15px;\n"
-"border-bottom: 3px solid rgb(255, 255, 255);\n"
-"border-top: 3px solid rgb(255, 255, 255);\n"
-"background:transparent;\n"
-"border-radius:10px;\n"
 "\n"
-"}\n"
 "\n"
 "#frame_download_settings, #frame_new_download_options{\n"
 "padding:5px;\n"
@@ -521,7 +511,7 @@ class Ui_MainWindow(object):
         self.scrollArea_downloadItems.setWidgetResizable(True)
         self.scrollArea_downloadItems.setObjectName("scrollArea_downloadItems")
         self.scrollAreaWidgetContents = QtWidgets.QWidget()
-        self.scrollAreaWidgetContents.setGeometry(QtCore.QRect(0, 0, 614, 363))
+        self.scrollAreaWidgetContents.setGeometry(QtCore.QRect(0, 0, 614, 313))
         self.scrollAreaWidgetContents.setObjectName("scrollAreaWidgetContents")
         self.scrollArea_downloadItems.setWidget(self.scrollAreaWidgetContents)
         self.gridLayout_3.addWidget(self.scrollArea_downloadItems, 0, 0, 1, 1)
@@ -549,7 +539,7 @@ class Ui_MainWindow(object):
         self.label_3.setFont(font)
         self.label_3.setObjectName("label_3")
         self.verticalLayout_11.addWidget(self.label_3, 0, QtCore.Qt.AlignHCenter)
-        self.verticalLayout_10.addWidget(self.frame_settings_title, 0, QtCore.Qt.AlignTop)
+        self.verticalLayout_10.addWidget(self.frame_settings_title, 0, QtCore.Qt.AlignHCenter|QtCore.Qt.AlignTop)
         self.frame_download_settings = QtWidgets.QFrame(self.page_settings)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Expanding)
         sizePolicy.setHorizontalStretch(0)
@@ -651,7 +641,7 @@ class Ui_MainWindow(object):
         self.labelNewDownloadTitle.setFont(font)
         self.labelNewDownloadTitle.setObjectName("labelNewDownloadTitle")
         self.verticalLayout_14.addWidget(self.labelNewDownloadTitle, 0, QtCore.Qt.AlignHCenter)
-        self.verticalLayout_15.addWidget(self.frame_new_download_title, 0, QtCore.Qt.AlignRight)
+        self.verticalLayout_15.addWidget(self.frame_new_download_title, 0, QtCore.Qt.AlignHCenter)
         self.frame_new_download_options = QtWidgets.QFrame(self.page_add_new)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Expanding)
         sizePolicy.setHorizontalStretch(0)
@@ -764,7 +754,7 @@ class Ui_MainWindow(object):
         self.scrollArea_VideoFormat.setWidgetResizable(True)
         self.scrollArea_VideoFormat.setObjectName("scrollArea_VideoFormat")
         self.scrollAreaWidgetContents_VideoFormat = QtWidgets.QWidget()
-        self.scrollAreaWidgetContents_VideoFormat.setGeometry(QtCore.QRect(0, 0, 582, 52))
+        self.scrollAreaWidgetContents_VideoFormat.setGeometry(QtCore.QRect(0, 0, 582, 86))
         self.scrollAreaWidgetContents_VideoFormat.setObjectName("scrollAreaWidgetContents_VideoFormat")
         self.scrollArea_VideoFormat.setWidget(self.scrollAreaWidgetContents_VideoFormat)
         self.verticalLayout_22.addWidget(self.scrollArea_VideoFormat)
@@ -997,7 +987,7 @@ class Ui_MainWindow(object):
         MainWindow.setCentralWidget(self.centralwidget)
 
         self.retranslateUi(MainWindow)
-        self.stackedWidget.setCurrentIndex(2)
+        self.stackedWidget.setCurrentIndex(1)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def retranslateUi(self, MainWindow):
