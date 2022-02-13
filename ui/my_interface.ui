@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>650</width>
+    <width>605</width>
     <height>469</height>
    </rect>
   </property>
@@ -43,6 +43,7 @@ cursor:&quot;Pointing Hand&quot;;
 
 */
 
+/*
 #frame_filter QLabel{
 font: 12pt &quot;MV Boli&quot;;
 background-color: rgb(30, 30, 30);
@@ -55,6 +56,34 @@ border: 1px solid rgb(0, 255, 127);
 border-radius:10px;
 
 }
+
+#frame_leftFilter{
+margin-top:10px;
+margin-bottom:10px;
+}
+
+#frame_social_media QPushButton{
+margin:2px;
+padding:2px;
+width:20px;
+height:20px;
+border-radius:2px;
+background-color:qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5, fy:0.5, stop:0 rgba(255, 235, 235, 206), stop:0.35 rgba(255, 188, 188, 80), stop:0.4 rgba(255, 162, 162, 80), stop:0.425 rgba(255, 132, 132, 156), stop:0.44 rgba(252, 128, 128, 80), stop:1 rgba(255, 255, 255, 0))
+}
+
+#frame_leftSettings QPushButton{
+background-color:rgb(0, 255, 127);
+border-radius:10px;
+margin:2px;
+padding:2px;
+}
+
+#buttonAddNew, #buttonMenu{
+border:none;
+margin:2px;
+padding:2px;
+}
+*/
 
 /*
 #frame_11 QPushButton{
@@ -73,10 +102,6 @@ font: 11pt;
 }
 
 
-#frame_leftFilter{
-margin-top:10px;
-margin-bottom:10px;
-}
 
 /*
 #header_frame{
@@ -117,21 +142,6 @@ border-radius:20px;
 }
 */
 
-#frame_social_media QPushButton{
-margin:2px;
-padding:2px;
-width:20px;
-height:20px;
-border-radius:2px;
-background-color:qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5, fy:0.5, stop:0 rgba(255, 235, 235, 206), stop:0.35 rgba(255, 188, 188, 80), stop:0.4 rgba(255, 162, 162, 80), stop:0.425 rgba(255, 132, 132, 156), stop:0.44 rgba(252, 128, 128, 80), stop:1 rgba(255, 255, 255, 0))
-}
-
-#frame_leftSettings QPushButton{
-background-color:rgb(0, 255, 127);
-border-radius:10px;
-margin:2px;
-padding:2px;
-}
 
 #stackedWidget QFrame{
 background-color: rgb(44, 44, 44);
@@ -154,11 +164,6 @@ margin:5px;
 padding: 5px;
 }
 
-#buttonAddNew, #buttonMenu{
-border:none;
-margin:2px;
-padding:2px;
-}
 
 #frame_new_download_options  QGroupBox{
 color: rgb(255, 255, 255);
@@ -695,6 +700,9 @@ margin:5px;
              </property>
              <item>
               <widget class="QPushButton" name="button_facebook">
+               <property name="cursor">
+                <cursorShape>PointingHandCursor</cursorShape>
+               </property>
                <property name="toolTip">
                 <string>Facebook</string>
                </property>
@@ -709,6 +717,9 @@ margin:5px;
              </item>
              <item>
               <widget class="QPushButton" name="button_tweeter">
+               <property name="cursor">
+                <cursorShape>PointingHandCursor</cursorShape>
+               </property>
                <property name="toolTip">
                 <string>Tweeter</string>
                </property>
@@ -723,6 +734,9 @@ margin:5px;
              </item>
              <item>
               <widget class="QPushButton" name="button_linkedin">
+               <property name="cursor">
+                <cursorShape>PointingHandCursor</cursorShape>
+               </property>
                <property name="toolTip">
                 <string>Linkedin</string>
                </property>
@@ -737,6 +751,9 @@ margin:5px;
              </item>
              <item>
               <widget class="QPushButton" name="button_instagram">
+               <property name="cursor">
+                <cursorShape>PointingHandCursor</cursorShape>
+               </property>
                <property name="toolTip">
                 <string>Instagram</string>
                </property>
@@ -750,7 +767,10 @@ margin:5px;
               </widget>
              </item>
              <item>
-              <widget class="QPushButton" name="pushButton_2">
+              <widget class="QPushButton" name="button_skype">
+               <property name="cursor">
+                <cursorShape>PointingHandCursor</cursorShape>
+               </property>
                <property name="toolTip">
                 <string>Skype</string>
                </property>
@@ -1078,8 +1098,8 @@ margin:5px;
                   <rect>
                    <x>0</x>
                    <y>0</y>
-                   <width>614</width>
-                   <height>313</height>
+                   <width>88</width>
+                   <height>18</height>
                   </rect>
                  </property>
                 </widget>
@@ -1622,8 +1642,8 @@ margin:5px;
                               <rect>
                                <x>0</x>
                                <y>0</y>
-                               <width>582</width>
-                               <height>86</height>
+                               <width>98</width>
+                               <height>28</height>
                               </rect>
                              </property>
                             </widget>
@@ -2163,11 +2183,14 @@ margin:5px;
               <number>0</number>
              </property>
              <item>
-              <widget class="QLabel" name="label">
+              <widget class="QLabel" name="labelAboutMe">
                <property name="font">
                 <font>
                  <family>MV Boli</family>
                 </font>
+               </property>
+               <property name="cursor">
+                <cursorShape>PointingHandCursor</cursorShape>
                </property>
                <property name="styleSheet">
                 <string notr="true"/>

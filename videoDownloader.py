@@ -11,7 +11,7 @@ from PyQt5.QtGui import QColor, QIcon
 from ui import my_interface_, my_item_window_interface_
 import boot
 
-
+import webbrowser
 from win10toast import ToastNotifier
 import pyautogui
 import psutil
@@ -71,6 +71,12 @@ class MainWindow(QMainWindow, my_interface_.Ui_MainWindow):
 
             self.statistics_data = {}  # holds the statistics data that will be transmitted by load statistics getter engine
 
+            self.button_facebook.clicked.connect(lambda: self.social_media_link())
+            self.button_tweeter.clicked.connect(lambda: self.social_media_link())
+            self.button_skype.clicked.connect(lambda: self.social_media_link())
+            self.button_instagram.clicked.connect(lambda: self.social_media_link())
+            self.button_linkedin.clicked.connect(lambda: self.social_media_link())
+
             self.message = "Info"
             self.timer = QBasicTimer()
             self.timer.start(200, self)
@@ -125,6 +131,44 @@ class MainWindow(QMainWindow, my_interface_.Ui_MainWindow):
         # self.engineLoader.load_statistics_getter_engine()
 
         self.generalFunctions.run_function(self.engineLoader.load_downloader_engine())
+
+    def social_media_link(self):
+
+        try:
+            s = self.sender()
+            if s.objectName() == self.button_linkedin.objectName():
+                print('linked in')
+                self.open_url_in_browser('www.linkedin.com/in/ajeyemi-alajede-96219424')
+            if s.objectName() == self.button_instagram.objectName():
+                print("instagram")
+                self.open_url_in_browser('https://www.instagram.com/ajeyemialajede/')
+            if s.objectName() == self.button_facebook.objectName():
+                print('facebook')
+                self.open_url_in_browser('https://web.facebook.com/Ajeyemi.Alajede')
+            if s.objectName() == self.button_tweeter.objectName():
+                print('tweeter')
+                self.open_url_in_browser('https://twitter.com/ajeyemi_alajede')
+            if s.objectName() == self.button_skype.objectName():
+                print('skype')
+        except Exception as e:
+            print(e)
+            me = f'An Error occurred while loading the webpage\n\n' \
+                  f'CONTACT ME\n' \
+                  f'www.linkedin.com/in/ajeyemi-alajede-96219424\n' \
+                  f'https://www.instagram.com/ajeyemialajede/\n' \
+                  f'https://web.facebook.com/Ajeyemi.Alajede\n' \
+                  f'https://twitter.com/ajeyemi_alajede' \
+                      f''
+            print(me)
+
+            QMessageBox.information(self, 'About jbadonaiventures international', str(me))
+
+    def open_url_in_browser(self, url):
+        webbrowser.register('chrome',
+                            None,
+                            webbrowser.BackgroundBrowser(
+                                "C://Program Files (x86)//Google//Chrome//Application//chrome.exe"))
+        webbrowser.get('chrome').open(url)
 
     def add_new_download(self):
         if self.busy is False:
@@ -397,6 +441,11 @@ class MainWindow(QMainWindow, my_interface_.Ui_MainWindow):
                         self.button_restore.setIcon(QIcon(":/white icons/White icon/minimize-2.svg"))
                 except Exception as e:
                     print(f"An Error occurred in MainWindow > eventFilter : \n >>>{e}")
+
+            if event.type() == QEvent.MouseButtonRelease and source == self.labelAboutMe:
+
+                self.open_url_in_browser('https://jbadonai-resume.herokuapp.com/')
+                pass
 
         except Exception as e:
             print(f"An Error Occurred in ItemWindow > eventFilter : \n{e}")

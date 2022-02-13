@@ -25,6 +25,7 @@ class LoadInterface():
 
         self.myself.setupUi(self.myself)  # set up the ui
         self.myself.setWindowFlag(Qt.FramelessWindowHint)  # remove windows title bar
+        self.myself.setWindowFlag(Qt.WindowStaysOnTopHint)  # remove windows title bar
         self.myself.setAttribute(Qt.WA_TranslucentBackground)
         self.myself.show()
 
@@ -83,13 +84,15 @@ class LoadInterface():
         # self.functions.run_function(self.initialize)
         try:
             self.myself.frame_title.installEventFilter(self.myself)
+            self.myself.labelAboutMe.installEventFilter(self.myself)
             pass
         except Exception as e:
             print(e)
 
         self.myself.buttonErrorDetected.setVisible(False)
 
-
+        # self.myself.button_skype.setVisible(False)
+        # self.myself.button_tweeter.setVisible(False)
         # connect buttons to functions
         self.myself.buttonAddNew.clicked.connect(lambda: self.myself.add_new_download())
         self.myself.buttonInProgress.clicked.connect(lambda : self.myself.filter())

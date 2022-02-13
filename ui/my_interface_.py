@@ -14,7 +14,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(650, 469)
+        MainWindow.resize(605, 469)
         MainWindow.setStyleSheet("")
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setStyleSheet("QFrame{\n"
@@ -42,6 +42,7 @@ class Ui_MainWindow(object):
 "\n"
 "*/\n"
 "\n"
+"/*\n"
 "#frame_filter QLabel{\n"
 "font: 12pt \"MV Boli\";\n"
 "background-color: rgb(30, 30, 30);\n"
@@ -54,6 +55,34 @@ class Ui_MainWindow(object):
 "border-radius:10px;\n"
 "\n"
 "}\n"
+"\n"
+"#frame_leftFilter{\n"
+"margin-top:10px;\n"
+"margin-bottom:10px;\n"
+"}\n"
+"\n"
+"#frame_social_media QPushButton{\n"
+"margin:2px;\n"
+"padding:2px;\n"
+"width:20px;\n"
+"height:20px;\n"
+"border-radius:2px;\n"
+"background-color:qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5, fy:0.5, stop:0 rgba(255, 235, 235, 206), stop:0.35 rgba(255, 188, 188, 80), stop:0.4 rgba(255, 162, 162, 80), stop:0.425 rgba(255, 132, 132, 156), stop:0.44 rgba(252, 128, 128, 80), stop:1 rgba(255, 255, 255, 0))\n"
+"}\n"
+"\n"
+"#frame_leftSettings QPushButton{\n"
+"background-color:rgb(0, 255, 127);\n"
+"border-radius:10px;\n"
+"margin:2px;\n"
+"padding:2px;\n"
+"}\n"
+"\n"
+"#buttonAddNew, #buttonMenu{\n"
+"border:none;\n"
+"margin:2px;\n"
+"padding:2px;\n"
+"}\n"
+"*/\n"
 "\n"
 "/*\n"
 "#frame_11 QPushButton{\n"
@@ -72,10 +101,6 @@ class Ui_MainWindow(object):
 "}\n"
 "\n"
 "\n"
-"#frame_leftFilter{\n"
-"margin-top:10px;\n"
-"margin-bottom:10px;\n"
-"}\n"
 "\n"
 "/*\n"
 "#header_frame{\n"
@@ -116,21 +141,6 @@ class Ui_MainWindow(object):
 "}\n"
 "*/\n"
 "\n"
-"#frame_social_media QPushButton{\n"
-"margin:2px;\n"
-"padding:2px;\n"
-"width:20px;\n"
-"height:20px;\n"
-"border-radius:2px;\n"
-"background-color:qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5, fy:0.5, stop:0 rgba(255, 235, 235, 206), stop:0.35 rgba(255, 188, 188, 80), stop:0.4 rgba(255, 162, 162, 80), stop:0.425 rgba(255, 132, 132, 156), stop:0.44 rgba(252, 128, 128, 80), stop:1 rgba(255, 255, 255, 0))\n"
-"}\n"
-"\n"
-"#frame_leftSettings QPushButton{\n"
-"background-color:rgb(0, 255, 127);\n"
-"border-radius:10px;\n"
-"margin:2px;\n"
-"padding:2px;\n"
-"}\n"
 "\n"
 "#stackedWidget QFrame{\n"
 "background-color: rgb(44, 44, 44);\n"
@@ -153,11 +163,6 @@ class Ui_MainWindow(object):
 "padding: 5px;\n"
 "}\n"
 "\n"
-"#buttonAddNew, #buttonMenu{\n"
-"border:none;\n"
-"margin:2px;\n"
-"padding:2px;\n"
-"}\n"
 "\n"
 "#frame_new_download_options  QGroupBox{\n"
 "color: rgb(255, 255, 255);\n"
@@ -356,6 +361,7 @@ class Ui_MainWindow(object):
         self.horizontalLayout_9.setSpacing(0)
         self.horizontalLayout_9.setObjectName("horizontalLayout_9")
         self.button_facebook = QtWidgets.QPushButton(self.frame_social_media)
+        self.button_facebook.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
         self.button_facebook.setText("")
         icon3 = QtGui.QIcon()
         icon3.addPixmap(QtGui.QPixmap(":/white icons/White icon/facebook.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
@@ -363,6 +369,7 @@ class Ui_MainWindow(object):
         self.button_facebook.setObjectName("button_facebook")
         self.horizontalLayout_9.addWidget(self.button_facebook)
         self.button_tweeter = QtWidgets.QPushButton(self.frame_social_media)
+        self.button_tweeter.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
         self.button_tweeter.setText("")
         icon4 = QtGui.QIcon()
         icon4.addPixmap(QtGui.QPixmap(":/white icons/White icon/twitter.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
@@ -370,6 +377,7 @@ class Ui_MainWindow(object):
         self.button_tweeter.setObjectName("button_tweeter")
         self.horizontalLayout_9.addWidget(self.button_tweeter)
         self.button_linkedin = QtWidgets.QPushButton(self.frame_social_media)
+        self.button_linkedin.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
         self.button_linkedin.setText("")
         icon5 = QtGui.QIcon()
         icon5.addPixmap(QtGui.QPixmap(":/white icons/White icon/linkedin.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
@@ -377,19 +385,21 @@ class Ui_MainWindow(object):
         self.button_linkedin.setObjectName("button_linkedin")
         self.horizontalLayout_9.addWidget(self.button_linkedin)
         self.button_instagram = QtWidgets.QPushButton(self.frame_social_media)
+        self.button_instagram.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
         self.button_instagram.setText("")
         icon6 = QtGui.QIcon()
         icon6.addPixmap(QtGui.QPixmap(":/white icons/White icon/instagram.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.button_instagram.setIcon(icon6)
         self.button_instagram.setObjectName("button_instagram")
         self.horizontalLayout_9.addWidget(self.button_instagram)
-        self.pushButton_2 = QtWidgets.QPushButton(self.frame_social_media)
-        self.pushButton_2.setText("")
+        self.button_skype = QtWidgets.QPushButton(self.frame_social_media)
+        self.button_skype.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        self.button_skype.setText("")
         icon7 = QtGui.QIcon()
         icon7.addPixmap(QtGui.QPixmap(":/icons/icons/Skype logo _25671.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        self.pushButton_2.setIcon(icon7)
-        self.pushButton_2.setObjectName("pushButton_2")
-        self.horizontalLayout_9.addWidget(self.pushButton_2)
+        self.button_skype.setIcon(icon7)
+        self.button_skype.setObjectName("button_skype")
+        self.horizontalLayout_9.addWidget(self.button_skype)
         self.verticalLayout_6.addWidget(self.frame_social_media, 0, QtCore.Qt.AlignBottom)
         self.verticalLayout_2.addWidget(self.frame_leftBottom, 0, QtCore.Qt.AlignBottom)
         self.horizontalLayout.addWidget(self.left_frame)
@@ -511,7 +521,7 @@ class Ui_MainWindow(object):
         self.scrollArea_downloadItems.setWidgetResizable(True)
         self.scrollArea_downloadItems.setObjectName("scrollArea_downloadItems")
         self.scrollAreaWidgetContents = QtWidgets.QWidget()
-        self.scrollAreaWidgetContents.setGeometry(QtCore.QRect(0, 0, 614, 313))
+        self.scrollAreaWidgetContents.setGeometry(QtCore.QRect(0, 0, 88, 18))
         self.scrollAreaWidgetContents.setObjectName("scrollAreaWidgetContents")
         self.scrollArea_downloadItems.setWidget(self.scrollAreaWidgetContents)
         self.gridLayout_3.addWidget(self.scrollArea_downloadItems, 0, 0, 1, 1)
@@ -754,7 +764,7 @@ class Ui_MainWindow(object):
         self.scrollArea_VideoFormat.setWidgetResizable(True)
         self.scrollArea_VideoFormat.setObjectName("scrollArea_VideoFormat")
         self.scrollAreaWidgetContents_VideoFormat = QtWidgets.QWidget()
-        self.scrollAreaWidgetContents_VideoFormat.setGeometry(QtCore.QRect(0, 0, 582, 86))
+        self.scrollAreaWidgetContents_VideoFormat.setGeometry(QtCore.QRect(0, 0, 98, 28))
         self.scrollAreaWidgetContents_VideoFormat.setObjectName("scrollAreaWidgetContents_VideoFormat")
         self.scrollArea_VideoFormat.setWidget(self.scrollAreaWidgetContents_VideoFormat)
         self.verticalLayout_22.addWidget(self.scrollArea_VideoFormat)
@@ -955,13 +965,14 @@ class Ui_MainWindow(object):
         self.verticalLayout_4.setContentsMargins(0, 0, 0, 0)
         self.verticalLayout_4.setSpacing(0)
         self.verticalLayout_4.setObjectName("verticalLayout_4")
-        self.label = QtWidgets.QLabel(self.frame_12)
+        self.labelAboutMe = QtWidgets.QLabel(self.frame_12)
         font = QtGui.QFont()
         font.setFamily("MV Boli")
-        self.label.setFont(font)
-        self.label.setStyleSheet("")
-        self.label.setObjectName("label")
-        self.verticalLayout_4.addWidget(self.label)
+        self.labelAboutMe.setFont(font)
+        self.labelAboutMe.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        self.labelAboutMe.setStyleSheet("")
+        self.labelAboutMe.setObjectName("labelAboutMe")
+        self.verticalLayout_4.addWidget(self.labelAboutMe)
         self.horizontalLayout_3.addWidget(self.frame_12, 0, QtCore.Qt.AlignHCenter)
         self.frame_13 = QtWidgets.QFrame(self.footer_frame)
         self.frame_13.setFrameShape(QtWidgets.QFrame.StyledPanel)
@@ -1020,7 +1031,7 @@ class Ui_MainWindow(object):
         self.button_tweeter.setToolTip(_translate("MainWindow", "Tweeter"))
         self.button_linkedin.setToolTip(_translate("MainWindow", "Linkedin"))
         self.button_instagram.setToolTip(_translate("MainWindow", "Instagram"))
-        self.pushButton_2.setToolTip(_translate("MainWindow", "Skype"))
+        self.button_skype.setToolTip(_translate("MainWindow", "Skype"))
         self.buttonMenu.setToolTip(_translate("MainWindow", "Show/Hide Menu"))
         self.label_title.setText(_translate("MainWindow", "JBAdonai Video Downloader"))
         self.button_minimize.setToolTip(_translate("MainWindow", "Minimize"))
@@ -1054,5 +1065,5 @@ class Ui_MainWindow(object):
         self.label_2.setText(_translate("MainWindow", "Statistics Engine"))
         self.buttonErrorDetected.setToolTip(_translate("MainWindow", "<html><head/><body><p>Error Detected!</p><p>Click to view Error Details.</p></body></html>"))
         self.buttonErrorDetected.setText(_translate("MainWindow", "Error Detected!"))
-        self.label.setText(_translate("MainWindow", "copyright jbadonaiventures 2021"))
+        self.labelAboutMe.setText(_translate("MainWindow", "copyright jbadonaiventures 2021"))
 import icons_rc

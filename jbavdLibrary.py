@@ -210,30 +210,22 @@ class StyleSheet():
             color: rgb(0, 255, 127);
         }
         
+        /* LEFT FRAME */
         #left_frame{
-        background-color: rgb(50, 50, 50);
+        background-color: rgb(80, 80, 80);
         padding:10px;
-        border-left:3px solid rgb(255, 255, 127);
-        border-right:3px solid rgb(255, 255, 127);
-        border-top:3px solid rgb(255, 255, 127);
-        border-bottom:3px solid rgb(255, 255, 127);
-        border-radius:70px;
+        border-left:3px solid rgb(190, 190, 190);
+        
+        border-top:3px solid rgb(190, 190, 190);
+        border-bottom:3px solid rgb(190, 190, 190);
+        border-radius:50px;
         margin-top: 30%;
         margin-bottom: 30%;
-        }
-    
-        #frame_filter QPushButton,#frame_action QPushButton, #buttonAddNew{
-        border: 2px solid  rgb(255,255, 255);
-        border-radius:14px;
-        height:30px;
-        margin: 3px;
-        padding:3px;
-        background-color:qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:0 rgba(0, 0, 0, 255), stop:0.55 rgba(86, 54, 22, 255), stop:1 rgba(0, 0, 0, 255));
-        font: 12pt "MS Shell Dlg";
-        color:rgb(255, 255, 255);
-        cursor:"Pointing Hand";
+        margin-right:-70px;
+        padding-right: 80px;
         }
         
+
         #frame_settings_title, #frame_new_download_title{
          border-left: 3px solid white;
         border-bottom: 3px solid white;
@@ -260,9 +252,9 @@ class StyleSheet():
         background:transparent;
         border-radius:10px;        
         }
-        */
-    
-        #frame_leftTop{
+        
+        
+          #frame_leftTop{
         background-color: rgb(30, 30, 30);
         margin-top:25px;
         border: 1px solid white;
@@ -274,16 +266,126 @@ class StyleSheet():
         #frame_leftTop:hover{
         border: 3px solid  blue;
         }
+        */
     
+        /* FRAME LEFT: TOP FRAME*/
+        #frame_leftTop{
+        margin-top:30px;
+        margin-bottom:90px;
+        padding:20px;
+        border-bottom: 7px solid qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5, fy:0.5, stop:0 rgba(255, 235, 235, 206), stop:0.35 rgba(255, 188, 188, 80), stop:0.4 rgba(255, 162, 162, 80), stop:0.425 rgba(255, 132, 132, 156), stop:0.44 rgba(252, 128, 128, 80), stop:1 rgba(255, 255, 255, 0));
+        border-top: 7px solid qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5, fy:0.5, stop:0 rgba(255, 235, 235, 206), stop:0.35 rgba(255, 188, 188, 80), stop:0.4 rgba(255, 162, 162, 80), stop:0.425 rgba(255, 132, 132, 156), stop:0.44 rgba(252, 128, 128, 80), stop:1 rgba(255, 255, 255, 0));
+        }
+      
+        
+         /* LEFT FRAME: MIDDLE */
+        #frame_leftFilter{
+        margin-top:10px;
+        margin-bottom:10px;        
+        }
+        
+        /* LEFT FRAME: MIDDLE > LABELS */
+        #frame_filter QLabel{
+        font: 12pt "MV Boli";
+        background-color: rgb(30, 30, 30);
+        height:20px;
+        margin-top: 3px;
+        margin-bottom: 3px;
+        padding-top:5px;
+        padding-bottom:5px;
+        border: 1px solid rgb(0, 255, 127);
+        border-radius:10px;
+        
+        }       
+       
+        /* LEFT FRAME: BOTTOM */
+        #frame_social_media{
+        margin-top: 5px;
+        margin-bottom: 5px;
+        padding-top: 5px;
+        padding-bottom: 5px;
+        }
+        
+        #frame_social_media QPushButton{        
+        margin-right:7px;
+        margin-left:7px;
+        padding:5px;
+        width:20px;
+        height:20px;
+        border-radius:15px;
+        background-color:grey;
+        }
+        
+        #frame_social_media QPushButton:hover{        
+        margin-right:7px;
+        margin-left:7px;
+        padding:10px;
+        border-radius:15px;
+        background-color:rgb(80,80,80);
+        border: 2px solid rgb(200,200,200);
+        cursor:"Pointing Hand";
+        }
+        
+        
+        
+        /* LEFT FRAME: SETTINGS AND TRASH BUTTON */
+        /*FRAME*/
+        #frame_leftSettings{
+        border-top: 7px solid qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5, fy:0.5, stop:0 rgba(255, 235, 235, 206), stop:0.35 rgba(255, 188, 188, 80), stop:0.4 rgba(255, 162, 162, 80), stop:0.425 rgba(255, 132, 132, 156), stop:0.44 rgba(252, 128, 128, 80), stop:1 rgba(255, 255, 255, 0));
+        border-bottom: 7px solid qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5, fy:0.5, stop:0 rgba(255, 235, 235, 206), stop:0.35 rgba(255, 188, 188, 80), stop:0.4 rgba(255, 162, 162, 80), stop:0.425 rgba(255, 132, 132, 156), stop:0.44 rgba(252, 128, 128, 80), stop:1 rgba(255, 255, 255, 0));
+        padding-left: 20px;
+        padding-right: 20px;
+        padding-bottom: 5px;
+        padding-top: 5px;
+        margin-bottom:20px;
+        }
+        /*BUTTON*/
+        #frame_leftSettings QPushButton{
+        background-color:rgb(0, 255, 127);
+        border-radius:10px;
+        margin:2px;
+        padding:2px;        
+        }
+        /*BUTTON: HOVER*/
+         #frame_trash QPushButton:hover, #frame_settings QPushButton:hover{
+        background-color: gray;
+        }
+        
+        #buttonMenu{
+        border: none;
+        margin:2px;
+        padding:2px;
+        }
+           
+        #buttonAddNew{
+        border: 1px solid grey;
+        margin:2px;
+        padding:20px;
+        }
+        
+        /* LEFT FRAME: MIDDLE BUTTONS*/
+        #frame_filter QPushButton,#frame_action QPushButton, #buttonAddNew{
+        border: 1px solid  rgb(175, 175, 175);
+        border-radius:14px;        
+        margin: 3px;
+        padding:7px;
+        background-color:qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:0 rgba(0, 0, 0, 255), stop:0.55 rgba(86, 54, 22, 255), stop:1 rgba(0, 0, 0, 255));
+        font: 12pt "MS Shell Dlg";
+        color:rgb(255, 255, 255);
+        
+        }
+        
+
+        /* LEFT FRAME: MIDDLE > BUTTONS HOVER*/
         #frame_filter QPushButton:hover,#frame_action QPushButton:hover, #buttonAddNew:hover{
-        border: 3px solid  blue;
+        border: 1px solid  grey;
         border-radius:14px;
         height:30px;
         margin: 3px;
         padding:3px;
-        background-color:qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:0 rgba(0, 0, 0, 255), stop:0.55 rgba(86, 54, 22, 255), stop:1 rgba(0, 0, 0, 255));
-        font: 12pt "MS Shell Dlg";
-        color:blue;
+        background-color:rgb(20,20,20);
+        font: 8pt "MS Shell Dlg";
+        color:grey;
         cursor:"Pointing Hand";
         }
     
@@ -295,21 +397,30 @@ class StyleSheet():
     
         }
     
-    
+        /* CLOSE - MINIMIZE - RESTORE BUTTON */
         #frame_11 QPushButton{
-        border-radius: 14px;
-        border:2px solid rgb(255, 255, 127);
-        margin:3px;
+        border-radius: 10px;
+        border:2px solid rgb(125, 125, 125);
+        margin-right:10px;
+        margin-left:10px;
         padding:1px;
         }
-    
+        
+        /* CLOSE - MINIMIZE - RESTORE BUTTON */
         #frame_11 QPushButton:hover{
-        border-radius: 12px;
-        border:2px solid rgb(60, 60, 60);
-        margin:3px;
+        border-radius: 10px;
+        border:2px solid white;
+        margin-right:10px;
+        margin-left:10px;
         padding:1px;
-        background-color: blue;
+        background-color: gray;
     
+        }
+        
+       
+        
+        #frame_leftTop{
+        margin-bottom: 10px;
         }
         
                 
@@ -341,6 +452,11 @@ class StyleSheet():
        
        #frame_error QPushButton{
        color: orange;
+       }
+       
+       #labelAboutMe:hover{
+       color: blue;
+       font:14pt;
        }
         """
 
